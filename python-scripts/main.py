@@ -50,7 +50,7 @@ for cenario in cenarios:
         coords = [(p[1], p[0]) for p in rota_geo['features'][0]['geometry']['coordinates']]
 
         csv_file = f"temp/{cenario['nome']}.csv"
-        salvar_csv(coords, csv_file)
+        salvar_csv(coords, csv_file, id_rota=cenario['nome'])
         print(f"📄 Coordenadas salvas em {csv_file}")
 
         html_file = f"temp/{cenario['nome']}.html"
