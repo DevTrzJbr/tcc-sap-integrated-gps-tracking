@@ -1,4 +1,5 @@
 🚀 Guia de configuração e execução do projeto Python
+
 1️⃣ Criar o ambiente virtual
 No diretório do projeto Python:
 
