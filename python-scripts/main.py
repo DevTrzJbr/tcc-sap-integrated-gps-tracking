@@ -49,13 +49,14 @@ for cenario in cenarios:
         rota_geo = gerar_rota(cenario["pontos"], evitar_poligonos=cenario["evitar"])
         coords = [(p[1], p[0]) for p in rota_geo['features'][0]['geometry']['coordinates']]
 
-        csv_file = f"desvio4/{cenario['nome']}.csv"
+        csv_file = f"temp/{cenario['nome']}.csv"
         salvar_csv(coords, csv_file)
         print(f"📄 Coordenadas salvas em {csv_file}")
 
-        html_file = f"desvio4/{cenario['nome']}.html"
+        html_file = f"temp/{cenario['nome']}.html"
         salvar_mapa(coords, html_file, titulo=cenario["nome"])
         print(f"🗺️ Mapa salvo em {html_file}")
 
     except Exception as e:
         print(f"❌ Erro ao processar {cenario['nome']}: {e}")
+
