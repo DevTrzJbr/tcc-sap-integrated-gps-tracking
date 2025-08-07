@@ -17,19 +17,19 @@ case "$ROLE" in
     git sparse-checkout set python-scripts
     ;;
   frontend)
-    git sparse-checkout set frontend_fiori
+    git sparse-checkout set frontend-fiori
     ;;
   backend)
-    git sparse-checkout set backend_node
+    git sparse-checkout set backend-node
     ;;
   sap)
-    git sparse-checkout set sap_artefacts
+    git sparse-checkout set sap-artefacts
     ;;
   docs)
     git sparse-checkout set docs
     ;;
   all)
-    git sparse-checkout set backend_node frontend_fiori python-scripts sap_artefacts docs
+    git sparse-checkout set backend-node frontend-fiori python-scripts sap-artefacts docs
     ;;
   *)
     echo "Perfil inválido: $ROLE"
