@@ -36,7 +36,7 @@ case "$ROLE" in
     ;;
   *)
     echo "Perfil inválido: $ROLE"
-    echo "Opções válidas: python | frontend | backend | sap | docs | all"
+    echo "Opções válidas: python | frontend | backend | sap | docs | all | main"
     exit 1
     ;;
 esac
