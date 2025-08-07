@@ -31,6 +31,9 @@ case "$ROLE" in
   all)
     git sparse-checkout set backend-node frontend-fiori python-scripts sap-artefacts docs
     ;;
+  main)
+    git sparse-checkout set master
+    ;;
   *)
     echo "Perfil inválido: $ROLE"
     echo "Opções válidas: python | frontend | backend | sap | docs | all"
