@@ -1,0 +1,4 @@
+[
+  { "id": 1, "placa": "ABC-1234", "status": "ativo" },
+  { "id": 2, "placa": "XYZ-5678", "status": "inativo" }
+]
