@@ -2,6 +2,10 @@
 const express = require('express');
 const router = express.Router();
 
+const landingPages = require('./landing.routes')
+
+router.use('/', landingPages);
+
 const veiculosRoutes = require('./veiculos.routes');
 
 router.use('/veiculos', veiculosRoutes);

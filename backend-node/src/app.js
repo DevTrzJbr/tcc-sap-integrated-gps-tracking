@@ -25,6 +25,11 @@ app.use(cors({
   credentials: true
 }));
 
+// Rota padrão
+app.get('/', (_req, res) => {
+  res.redirect('/api/');
+});
+
 // Rota de saúde
 app.get('/ping', (_req, res) => res.json({ status: 'ok' }));
 
