@@ -21,7 +21,7 @@ app.use(express.json());
 
 // CORS (libera UI5 local, ajuste conforme necessário)
 app.use(cors({
-  origin: ['http://localhost:8080', 'http://127.0.0.1:8080'],
+  origin: ['http://localhost:8080', 'http://127.0.0.1:8080', 'null'],
   credentials: true
 }));
 
