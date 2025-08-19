@@ -6,11 +6,31 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+    }
+    #controls {
+      position: absolute;
+      top: 10px;
+      left: 50px;
+      z-index: 1000;
+      background: white;
+      padding: 10px;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    }
     #map { height: 100vh; }
   </style>
 </head>
 <body>
+  <div id="controls">
+    <input type="text" id="rotaInput" placeholder="Digite o nome da rota" />
+    <button onclick="carregarRota()">Carregar</button>
+  </div>
+
   <div id="map"></div>
+
   <script>
     // Inicializa o mapa
     const map = L.map('map').setView([-23.52972, -46.57421], 15);
@@ -20,27 +40,41 @@
       attribution: '© OpenStreetMap contributors'
     }).addTo(map);
 
-    // Carrega GeoJSON da API
-    fetch('http://localhost:3000/api/rota/rota_normal')
-      .then(res => res.json())
-      .then(data => {
-        console.log("GeoJSON recebido:", data);
+    let rotaLayer; // camada atual da rota
 
-        // Adiciona a rota ao mapa
-        const layer = L.geoJSON(data).addTo(map);
+    function carregarRota() {
+      const rota = document.getElementById("rotaInput").value.trim();
+      if (!rota) {
+        alert("Digite o nome da rota!");
+        return;
+      }
 
-        // Pega os limites da camada
-        const bounds = layer.getBounds();
-        console.log("Bounds calculados:", bounds);
+      // Remove a rota anterior se existir
+      if (rotaLayer) {
+        map.removeLayer(rotaLayer);
+      }
 
-        // Ajusta o zoom para caber toda a rota se os bounds forem válidos
-        if (bounds.isValid()) {
-          map.fitBounds(bounds);
-        } else {
-          console.error("Bounds inválidos! Verifique se as coordenadas estão no formato correto [lon, lat] no GeoJSON.");
-        }
-      })
-      .catch(err => console.error("Erro ao carregar GeoJSON:", err));
+      fetch(`http://localhost:3000/api/rota/${rota}`)
+        .then(res => res.json())
+        .then(data => {
+          console.log("GeoJSON recebido:", data);
+
+          // Adiciona a rota ao mapa
+          rotaLayer = L.geoJSON(data).addTo(map);
+
+          // Pega os limites da camada
+          const bounds = rotaLayer.getBounds();
+          console.log("Bounds calculados:", bounds);
+
+          // Ajusta o zoom para caber toda a rota se os bounds forem válidos
+          if (bounds.isValid()) {
+            map.fitBounds(bounds);
+          } else {
+            console.error("Bounds inválidos! Verifique se as coordenadas estão no formato correto [lon, lat] no GeoJSON.");
+          }
+        })
+        .catch(err => console.error("Erro ao carregar GeoJSON:", err));
+    }
   </script>
 </body>
 </html>
