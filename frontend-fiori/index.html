@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Exemplo Rota Leaflet</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <style>
+    #map { height: 100vh; }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+  <script>
+    // Inicializa o mapa
+    const map = L.map('map').setView([-23.52972, -46.57421], 15);
+
+    // Tile base
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    // Carrega GeoJSON da API
+    fetch('http://localhost:3000/api/rota/rota_normal')
+      .then(res => res.json())
+      .then(data => {
+        console.log("GeoJSON recebido:", data);
+
+        // Adiciona a rota ao mapa
+        const layer = L.geoJSON(data).addTo(map);
+
+        // Pega os limites da camada
+        const bounds = layer.getBounds();
+        console.log("Bounds calculados:", bounds);
+
+        // Ajusta o zoom para caber toda a rota se os bounds forem válidos
+        if (bounds.isValid()) {
+          map.fitBounds(bounds);
+        } else {
+          console.error("Bounds inválidos! Verifique se as coordenadas estão no formato correto [lon, lat] no GeoJSON.");
+        }
+      })
+      .catch(err => console.error("Erro ao carregar GeoJSON:", err));
+  </script>
+</body>
+</html>
