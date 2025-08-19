@@ -2,8 +2,14 @@ import csv
 import folium
 import os
 from datetime import datetime, timedelta
+import json
 
-def salvar_csv(coords, nome_arquivo, id_rota):
+def salvar_csv(coords, nome_arquivo, id_rota, pontos_extra=None, areas_proibidas=None):
+    """
+    coords: lista de tuplas (lat, lon) da rota principal
+    pontos_extra: dict {nome: (lat, lon)} de flags, paradas, etc
+    areas_proibidas: lista de áreas (polígonos), cada área = {"nome": "Area 1", "coordinates": [[(lon, lat), ...]]}
+    """
     pasta = os.path.dirname(nome_arquivo)
     if pasta and not os.path.exists(pasta):
         os.makedirs(pasta)
@@ -16,16 +22,40 @@ def salvar_csv(coords, nome_arquivo, id_rota):
             "Longitude", 
             "Latitude", 
             "Timestamp", 
-            "Outras Informações"
+            "Tipo",
+            "Nome"
         ])
         
         tempo_inicial = datetime.now()
         intervalo = timedelta(seconds=30)
 
+        # Rota principal
         for idx, (lat, lon) in enumerate(coords, start=1):
             timestamp = (tempo_inicial + intervalo * (idx - 1)).isoformat(sep=" ", timespec="seconds")
-            outras_info = None
-            writer.writerow([id_rota, idx, lon, lat, timestamp, outras_info])
+            tipo = "rota"
+            nome = None
+            # Origem e destino
+            if idx == 1:
+                tipo = "flag"
+                nome = "Origem"
+            elif idx == len(coords):
+                tipo = "flag"
+                nome = "Destino"
+            writer.writerow([id_rota, idx, lon, lat, timestamp, tipo, nome])
+
+        # Pontos extras
+        if pontos_extra:
+            for idx_extra, (nome, (lat, lon)) in enumerate(pontos_extra.items(), start=len(coords)+1):
+                timestamp = (tempo_inicial + intervalo * (idx_extra - 1)).isoformat(sep=" ", timespec="seconds")
+                writer.writerow([id_rota, idx_extra, lon, lat, timestamp, "flag", nome])
+
+        # Áreas proibidas
+        if areas_proibidas:
+            for area in areas_proibidas:
+                for idx_poly, (lon, lat) in enumerate(area["coordinates"][0], start=1):
+                    timestamp = (tempo_inicial + intervalo * (len(coords) + idx_poly)).isoformat(sep=" ", timespec="seconds")
+                    writer.writerow([id_rota, len(coords)+idx_poly, lon, lat, timestamp, "polygon", area.get("nome", "Área Proibida")])
+
 
 def salvar_mapa(coords, nome_arquivo, titulo, pontos_extra=None, areas_proibidas=None):
     pasta = os.path.dirname(nome_arquivo)
@@ -64,3 +94,11 @@ def salvar_mapa(coords, nome_arquivo, titulo, pontos_extra=None, areas_proibidas
 
     mapa.save(nome_arquivo)
 
+
+def salvar_geo(mapa_geo, nome_arquivo, titulo):
+    pasta = os.path.dirname(nome_arquivo)
+    if pasta and not os.path.exists(pasta):
+        os.makedirs(pasta)
+
+    with open(nome_arquivo, "w", encoding="utf-8") as f:
+        json.dump(mapa_geo, f, ensure_ascii=False, indent=2)

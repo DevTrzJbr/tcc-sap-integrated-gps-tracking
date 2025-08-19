@@ -1,6 +1,6 @@
 from .geo_utils import buscar_coordenadas
 from .route_utils import gerar_rota
-from .export_utils import salvar_csv, salvar_mapa
+from .export_utils import salvar_csv, salvar_mapa, salvar_geo
 
 
 def validar_coordenadas(pontos, nome_cenario):
@@ -94,6 +94,12 @@ for cenario in cenarios:
         )
 
         print(f"🗺️ Mapa salvo em {html_file}")
+
+        # Exportar GeoJSON
+        geo_file = f"temp/{cenario['nome']}.json"
+        salvar_geo(rota_geo, geo_file, titulo=cenario["nome"])
+
+        print(f"🔤 GeoJSON salvo em {geo_file}")
 
     except Exception as e:
         print(f"❌ Erro ao processar {cenario['nome']}: {e}")
