@@ -13,7 +13,7 @@ router.get('/', (_req, res) => {
             veiculos: { method: 'GET', url: '/api/veiculos', description: 'Lista veículos cadastrados' }
         },
         example: {
-            rotaCsv: '/api/rota/rota_normal',
+            rota: '/api/rota/rota_normal',
             veiculos: '/api/veiculos'
         }
     });
