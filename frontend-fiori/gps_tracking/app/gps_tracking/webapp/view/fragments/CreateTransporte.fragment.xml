@@ -1,0 +1,33 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core">
+    
+    <Dialog
+        id="createTransporteDialog"
+        title="Novo Transporte"
+        contentHeight="auto"
+        contentWidth="25rem"
+        draggable="true"
+        resizable="true">
+        
+        <VBox class="sapUiSmallMargin">
+            <Label text="Placa" labelFor="inpPlaca"/>
+            <Input id="inpPlaca" value="{form>/placa}" maxLength="7" placeholder="ABC1D23" />
+
+            <Label text="Marca" labelFor="inpMarca"/>
+            <Input id="inpMarca" value="{form>/marca}" placeholder="Ex: Volvo" />
+
+            <Label text="Modelo" labelFor="inpModelo"/>
+            <Input id="inpModelo" value="{form>/modelo}" placeholder="Ex: FH 540" />
+        </VBox>
+
+        <beginButton>
+            <Button text="Salvar" type="Emphasized" press=".onSaveCreate"/>
+        </beginButton>
+
+        <endButton>
+            <Button text="Cancelar" press=".onCancelCreate"/>
+        </endButton>
+
+    </Dialog>
+</core:FragmentDefinition>

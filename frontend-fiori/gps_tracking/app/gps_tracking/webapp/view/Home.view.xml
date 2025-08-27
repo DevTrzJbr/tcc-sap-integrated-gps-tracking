@@ -1,0 +1,53 @@
+<mvc:View controllerName="com.tcc.gpstracking.controller.Home"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m">
+    <Page id="page" title="{i18n>title}">
+
+    	<Table id="idProductsTable"
+		inset="false"
+		items="{
+			path: '/Transporte'
+			
+		}">
+		
+        <headerToolbar>
+			<OverflowToolbar>
+				<content>
+					<Title text="Transportes" level="H2"/>
+					<ToolbarSpacer />
+                    <Button text="Create" type="Transparent" press="onPress" />
+				</content>
+			</OverflowToolbar>
+		</headerToolbar>
+
+		<columns>
+			<Column
+				width="12em">
+				<Text text="Placa" />
+			</Column>
+			<Column
+				minScreenWidth="Tablet"
+				demandPopin="true">
+				<Text text="Marca" />
+			</Column>
+			<Column
+				minScreenWidth="Desktop"
+				demandPopin="true"
+				hAlign="End">
+				<Text text="Modelo" />
+			</Column>
+		</columns>
+		<items>
+			<ColumnListItem vAlign="Middle">
+				<cells>
+					<Link
+						text="{placa}" />
+                    <Text text="{marca}" />
+					<Text text="{modelo}" />
+				</cells>
+			</ColumnListItem>
+		</items>
+	</Table>
+
+    </Page>
+</mvc:View>
