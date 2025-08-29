@@ -25,7 +25,7 @@ def process_scenario(scenario: Scenario, base_out_dir: Path) -> RunOutput:
     validar_poligono(scenario.evitar, scenario.nome)
 
     # 2) gera rota GeoJSON (em (lon,lat) na geometria)
-    rota_geo: GeoJSON = gerar_rota(scenario.pontos, evitar_poligonos=scenario.evitar)
+    rota_geo, distancia_km, duracao_min = gerar_rota(scenario.pontos, evitar_poligonos=scenario.evitar)
 
     # 3) extrai coordenadas e converte p/ (lat,lon) para mapa/csv
     coords_lonlat = rota_geo["features"][0]["geometry"]["coordinates"]
@@ -46,7 +46,15 @@ def process_scenario(scenario: Scenario, base_out_dir: Path) -> RunOutput:
         pontos_extra[f"Ponto Extra {idx}"] = (lat, lon)  # (lat,lon) p/ mapa
 
     # 6) exporta
-    salvar_csv(coords_latlon, str(csv_file), id_rota=scenario.nome)
+    salvar_csv(
+        coords_latlon,
+        str(csv_file),
+        id_rota=scenario.nome,
+        pontos_extra=pontos_extra,           # os “pontos de parada” do cenário
+        areas_proibidas=[scenario.evitar] if scenario.evitar else None,
+        duracao_min=duracao_min,             # vindo do resumo da rota
+        tempo_parada_min=10                  # ex.: 10 min parado em cada ponto_extra
+    )
     salvar_mapa(
         coords_latlon,
         str(html_file),
@@ -66,6 +74,8 @@ def process_scenario(scenario: Scenario, base_out_dir: Path) -> RunOutput:
         html_file=html_file,
         geojson_file=geojson_file,
         inserted_points=len(coords_latlon),
+        distancia_km=distancia_km,
+        duracao_min=duracao_min
     )
 
 

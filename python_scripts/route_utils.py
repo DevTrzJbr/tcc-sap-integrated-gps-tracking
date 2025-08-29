@@ -16,12 +16,14 @@ def gerar_rota(pontos, evitar_poligonos=None, preference='shortest'):
     resposta = client.directions(**params)
 
     # Extrair distância (metros) e duração (segundos)
+    distancia_km = None
+    duracao_min = None
     try:
         summary = resposta['features'][0]['properties']['summary']
         distancia_km = summary['distance'] / 1000
         duracao_min = summary['duration'] / 60
-        print(f"🚗 Rota: {distancia_km:.2f} km, {duracao_min:.1f} min")
+        # print(f"🚗 Rota: {distancia_km:.2f} km, {duracao_min:.1f} min")
     except Exception as e:
         print(f"⚠️ Erro ao extrair resumo da rota: {e}")
 
-    return resposta
+    return resposta, distancia_km, duracao_min

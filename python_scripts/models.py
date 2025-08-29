@@ -24,3 +24,5 @@ class RunOutput:
     html_file: Path
     geojson_file: Path
     inserted_points: int = 0
+    distancia_km: float = 0.0
+    duracao_min: float = 0.0

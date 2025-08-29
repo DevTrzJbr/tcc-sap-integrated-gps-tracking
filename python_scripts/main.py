@@ -4,12 +4,13 @@ from functools import lru_cache
 
 from python_scripts.models import Scenario
 from python_scripts.runner import run_all
-from python_scripts.geo_utils import buscar_coordenadas  # já existente
+from python_scripts.geo_utils import buscar_coordenadas
 
 # ————— logging básico (console)
 logging.basicConfig(
     level=logging.INFO,
-    format="%(asctime)s %(levelname)s %(name)s - %(message)s"
+    format="%(asctime)s | %(levelname)-8s | %(name)s :: %(message)s",
+    datefmt="%H:%M:%S"
 )
 
 # Cache simples para evitar geocodificar o mesmo endereço toda hora
@@ -55,7 +56,7 @@ def main():
     # ========= CENÁRIOS =========
     cenarios = [
         Scenario(nome="rota_normal",         pontos=[origem, destino]),
-        Scenario(nome="rota_com_desvio_1",   pontos=[origem, ponto_desvio1, destino], evitar=retangulo1),
+        Scenario(nome="rota_com_desvio_1",   pontos=[origem, ponto_desvio1, ponto_desvio2, destino], evitar=retangulo1),
         Scenario(nome="rota_com_paradas",    pontos=[origem, parada2, parada1, destino], evitar=retangulo1),
         # Ex.: Scenario(nome="rota_com_desvio_2", pontos=[origem, ponto_desvio2, destino], evitar=retangulo2),
     ]
