@@ -1,3 +1,44 @@
 <mvc:View
-	xmlns:mvc="sap.ui.core.mvc">
+  controllerName="com.tcc.gpstracking.controller.Detail"
+  xmlns:mvc="sap.ui.core.mvc"
+  xmlns="sap.m"
+  xmlns:core="sap.ui.core">
+
+  <Page title="Rotas &amp; Analytics">
+    <content>
+      <VBox renderType="Bare">
+        <!-- Container do mapa (HTML escapado) -->
+        <core:HTML id="leafletHtml"
+          content="&lt;div id='map' style='height:420px;width:100%;'&gt;&lt;/div&gt;"/>
+
+        <!-- Analytics abaixo do mapa -->
+        <Panel headerText="Resumo das Rotas" class="sapUiNoContentPadding">
+          <HBox justifyContent="SpaceBetween" wrap="Wrap">
+            <VBox>
+              <ObjectStatus title="Total de Rotas" state="Information"
+                text="{analytics>/totalRotas}" />
+              <ObjectStatus title="Distância Total (km)" state="Success"
+                text="{analytics>/distanciaTotalKm}" />
+            </VBox>
+            <VBox>
+              <ObjectStatus title="Tempo Total (h)" state="None"
+                text="{analytics>/tempoTotalH}" />
+              <ObjectStatus title="Custo Estimado (R$)" state="Warning"
+                text="{analytics>/custoTotal}" />
+            </VBox>
+          </HBox>
+        </Panel>
+
+        <List id="routeList" headerText="Rotas Renderizadas">
+          <items>
+            <StandardListItem
+              title="{routes>id}"
+              description="De {routes>from} para {routes>to} — {routes>km} km"
+              icon="sap-icon://map"
+              type="Inactive"/>
+          </items>
+        </List>
+      </VBox>
+    </content>
+  </Page>
 </mvc:View>

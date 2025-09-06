@@ -9,6 +9,7 @@ sap.ui.define([
 
     return Controller.extend("com.tcc.gpstracking.controller.Home", {
         onInit() {
+            this.oRouter = this.getOwnerComponent().getRouter();
         },
         onPress: async function () {
 
@@ -24,6 +25,10 @@ sap.ui.define([
             const oFormModel = new JSONModel({ placa: "", marca: "", modelo: "" });
             this._oCreateDialog.setModel(oFormModel, "form");
             this._oCreateDialog.open();
+        },
+
+        onPressDetail: function (oEvent) {
+	        this.oRouter.navTo("RouteDetail");
         },
 
         onSaveCreate: async function () {

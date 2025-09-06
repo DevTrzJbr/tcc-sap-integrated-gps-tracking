@@ -5,21 +5,6 @@
     xmlns="sap.m"
     xmlns:f="sap.f"
 >
-    <f:FlexibleColumnLayout
-        id="fcl"
-        backgroundDesign="Solid"
-    >
-        <f:beginColumnPages>
-            <mvc:XMLView
-                id="beginView"
-                viewName="com.tcc.gpstracking.view.Home"
-            />
-        </f:beginColumnPages>
-        <f:midColumnPages>
-            <mvc:XMLView
-                id="detailView"
-                viewName="com.tcc.gpstracking.view.Detail"
-            />
-        </f:midColumnPages>
-    </f:FlexibleColumnLayout>
+    <App id="app">
+    </App>
 </mvc:View>

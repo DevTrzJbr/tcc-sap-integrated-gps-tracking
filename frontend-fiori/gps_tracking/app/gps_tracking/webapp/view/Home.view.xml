@@ -8,7 +8,7 @@
 		items="{
 			path: '/Transporte'
 			
-		}">
+		}" itemPress="onPressDetail">
 		
         <headerToolbar>
 			<OverflowToolbar>
@@ -38,10 +38,9 @@
 			</Column>
 		</columns>
 		<items>
-			<ColumnListItem vAlign="Middle">
+			<ColumnListItem vAlign="Middle" type="Navigation">
 				<cells>
-					<Link
-						text="{placa}" />
+					<Text text="{placa}" />
                     <Text text="{marca}" />
 					<Text text="{modelo}" />
 				</cells>

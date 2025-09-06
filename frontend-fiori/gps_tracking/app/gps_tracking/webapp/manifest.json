@@ -82,35 +82,46 @@
     "routing": {
       "config": {
         "routerClass": "sap.m.routing.Router",
-        "controlId": "fcl",
+        "controlId": "app",
         "transition": "slide",
         "type": "View",
         "viewType": "XML",
         "path": "com.tcc.gpstracking.view",
         "async": true,
-        "viewPath": "com.tcc.gpstracking.view"
+        "viewPath": "com.tcc.gpstracking.view",
+        "controlAggregation": "pages"
       },
       "routes": [
         {
           "name": "RouteHome",
-          "pattern": ":layout:",
+          "pattern": "",
           "target": [
             "TargetHome"
+          ]
+        },
+         {
+          "name": "RouteDetail",
+          "pattern": "Detail",
+          "target": [
+            "TargetDetail"
           ]
         }
       ],
       "targets": {
         "TargetHome": {
           "id": "Home",
-          "name": "Home",
-          "controlAggregation": "beginColumnPages"
+          "name": "Home"
+        },
+        "TargetDetail": {
+          "id": "Detail",
+          "name": "Detail"
         }
       }
     },
     "rootView": {
       "viewName": "com.tcc.gpstracking.view.App",
       "type": "XML",
-      "id": "fcl",
+      "id": "app",
       "async": true
     }
   }
