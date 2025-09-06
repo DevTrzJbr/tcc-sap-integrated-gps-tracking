@@ -31,9 +31,9 @@ def process_scenario(scenario: Scenario, base_out_dir: Path) -> RunOutput:
     coords_lonlat = rota_geo["features"][0]["geometry"]["coordinates"]
     coords_latlon = _to_latlon(coords_lonlat)
 
-    # 4) prepara diretórios/arquivos
-    out_dir = base_out_dir / scenario.nome
-    out_dir.mkdir(parents=True, exist_ok=True)
+    # 4) prepara diretórios/arquivos  <<< ALTERADO
+    out_dir = base_out_dir                      # sem subpasta por cenário
+    out_dir.mkdir(parents=True, exist_ok=True)  # garante que exista
 
     csv_file = out_dir / f"{scenario.nome}.csv"
     html_file = out_dir / f"{scenario.nome}.html"
