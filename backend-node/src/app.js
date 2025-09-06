@@ -12,7 +12,22 @@ const { notFoundHandler, errorHandler } = require('./middlewares/error');
 const app = express();
 
 // Segurança e performance
-app.use(helmet());
+// Segurança e performance
+app.use(helmet({
+  contentSecurityPolicy: {
+    useDefaults: true,
+    directives: {
+      "default-src": ["'self'"],
+      "script-src": ["'self'"],                 // todos scripts locais (sem CDN nem inline)
+      "style-src": ["'self'", "'unsafe-inline'"], // Leaflet usa CSS inline para ícones
+      "img-src": ["'self'", "data:", "https://*.tile.openstreetmap.org"], // tiles do OSM + data URIs
+      "connect-src": ["'self'"],               // SSE no mesmo host (/api/stream/..)
+      "object-src": ["'none'"],
+      "worker-src": ["'self'"]
+    }
+  }
+}));
+
 app.use(compression());
 
 // Logs e payloads
@@ -35,6 +50,9 @@ app.get('/ping', (_req, res) => res.json({ status: 'ok' }));
 
 // Rotas da API
 app.use('/api', routes);
+
+const path = require('path');
+app.use(express.static(path.join(__dirname, '..', 'public')));
 
 // Middlewares de erro
 app.use(notFoundHandler);
