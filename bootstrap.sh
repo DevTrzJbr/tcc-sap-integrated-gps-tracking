@@ -29,7 +29,7 @@ case "$ROLE" in
     git sparse-checkout set docs
     ;;
   all)
-    git sparse-checkout set backend-node frontend-fiori python-scripts sap-artefacts docs
+    git sparse-checkout set backend-node frontend-fiori python_scripts sap-artefacts docs
     ;;
   main)
     git sparse-checkout set master
