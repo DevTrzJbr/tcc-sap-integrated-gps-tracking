@@ -1,21 +1,17 @@
+// src/services/telemetry.service.js
 const { readCsv } = require('./csv.service');
 
-/**
- * Converte as linhas do CSV em um array de pontos tipados/ordenados
- * Espera colunas: Latitude, Longitude, Timestamp, Tipo, Nome
- */
 function normalizeCsvRows(rows) {
   const points = rows
     .map(r => ({
       lat: Number(r.Latitude),
       lon: Number(r.Longitude),
-      ts:  new Date(r.Timestamp),  // Date ou NaN se inválido
+      ts: new Date(r.Timestamp),
       tipo: r.Tipo || 'rota',
       nome: r.Nome || null
     }))
     .filter(p => Number.isFinite(p.lat) && Number.isFinite(p.lon));
 
-  // ordena por timestamp se possível; senão mantém ordem original
   points.sort((a, b) => {
     const ta = a.ts.getTime();
     const tb = b.ts.getTime();
@@ -25,17 +21,23 @@ function normalizeCsvRows(rows) {
   return points;
 }
 
-/**
- * Reproduz os pontos como um stream SSE. Atraso é calculado pela diferença
- * de timestamps do CSV e comprimido por um "speed" (acelerador).
- * - speed=1 → tempo real; speed=10 → 10x mais rápido
- * - minMs define um atraso mínimo entre mensagens (padrão 300 ms)
- */
 async function playCsvAsSSE({ res, routeName, speed = 8, minMs = 300 }) {
-  const rows = await readCsv(`${routeName}.csv`);
+  let rows;
+  try {
+    rows = await readCsv(`${routeName}.csv`);
+  } catch (err) {
+    console.error('[SSE] erro ao ler CSV:', err);
+    if (!res.headersSent) {
+      if (err.code === 'ENOENT') {
+        return res.status(404).json({ error: 'CSV não encontrado', route: routeName });
+      }
+      return res.status(500).json({ error: 'Falha ao ler CSV', details: err.message });
+    }
+    return;
+  }
+
   const points = normalizeCsvRows(rows);
 
-  // headers SSE
   res.setHeader('Content-Type', 'text/event-stream; charset=utf-8');
   res.setHeader('Cache-Control', 'no-cache, no-transform');
   res.setHeader('Connection', 'keep-alive');
@@ -68,7 +70,7 @@ async function playCsvAsSSE({ res, routeName, speed = 8, minMs = 300 }) {
     }
 
     const p = points[i];
-    write(null, { // evento "message" padrão
+    write(null, {
       idx: i + 1,
       lat: p.lat,
       lon: p.lon,
@@ -83,21 +85,14 @@ async function playCsvAsSSE({ res, routeName, speed = 8, minMs = 300 }) {
       return res.end();
     }
 
-    // calcula atraso a partir do CSV (com compressão por 'speed')
-    const prev = p;
     const next = points[i];
-    const deltaMs = (next.ts - prev.ts);
-    const delay = Number.isFinite(deltaMs) && deltaMs > 0
-      ? deltaMs / Math.max(1, speed)
-      : minMs;
+    const deltaMs = (next.ts - p.ts);
+    const delay = Number.isFinite(deltaMs) && deltaMs > 0 ? deltaMs / Math.max(1, speed) : minMs;
 
     scheduleNext(delay);
   };
 
-  // primeiro tick imediatamente
   scheduleNext(0);
-
-  // limpar ao fechar conexão
   res.on('close', () => { closed = true; });
 }
 
