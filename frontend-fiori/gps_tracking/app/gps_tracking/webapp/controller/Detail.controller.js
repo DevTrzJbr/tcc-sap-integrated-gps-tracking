@@ -21,6 +21,10 @@ sap.ui.define([
 
   return Controller.extend("com.tcc.gpstracking.controller.Detail", {
     onInit: function () {
+      // ouvir a rota de detalhe e capturar o parâmetro {transpId}
+      this._router = this.getOwnerComponent().getRouter();
+      this._router.getRoute("RouteDetail").attachPatternMatched(this._onRouteMatched, this);
+
       // Models de exemplo (mantidos)
       const oData = {
         analytics: { totalRotas: 3, distanciaTotalKm: 128.3, tempoTotalH: 5.6, custoTotal: "2.450,00" },
@@ -41,6 +45,16 @@ sap.ui.define([
       this._pts = [];
 
       this.getView().addEventDelegate({ onAfterRendering: this._onAfterRendering.bind(this) });
+    },
+    
+    _onRouteMatched: function (oEvent) {
+      const args = oEvent.getParameter("arguments");
+      const transpId = decodeURIComponent(args.transpId || "");
+      // joga o ID no input para o usuário ver/editar, se quiser:
+      const oInp = this.byId("inpRota");
+      if (oInp) oInp.setValue(transpId);
+      // (opcional) já carrega a rota automaticamente ao entrar:
+      if (transpId) { this.onCarregarRota(); }
     },
 
     _onAfterRendering: function () {

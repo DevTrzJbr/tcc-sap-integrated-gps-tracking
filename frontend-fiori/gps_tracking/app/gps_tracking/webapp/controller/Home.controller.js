@@ -28,7 +28,15 @@ sap.ui.define([
         },
 
         onPressDetail: function (oEvent) {
-	        this.oRouter.navTo("RouteDetail");
+            const oItem = oEvent.getParameter("listItem");           // ColumnListItem
+            const oCtx  = oItem.getBindingContext();                 // contexto do modelo default (OData v4)
+            // ajuste o nome do campo abaixo para a sua chave real (ex.: "ID" ou "placa")
+            const id = oCtx.getProperty("placa"); 
+            if (!id) {
+                sap.m.MessageToast.show("ID do transporte não encontrado.");
+                return;
+            }
+            this.oRouter.navTo("RouteDetail", { transpId: encodeURIComponent(id) });
         },
 
         onSaveCreate: async function () {

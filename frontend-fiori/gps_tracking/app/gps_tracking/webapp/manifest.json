@@ -99,9 +99,9 @@
             "TargetHome"
           ]
         },
-         {
+        {
           "name": "RouteDetail",
-          "pattern": "Detail",
+          "pattern": "Detail/{transpId}",
           "target": [
             "TargetDetail"
           ]
