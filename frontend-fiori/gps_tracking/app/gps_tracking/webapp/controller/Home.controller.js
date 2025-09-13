@@ -31,7 +31,7 @@ sap.ui.define([
             const oItem = oEvent.getParameter("listItem");           // ColumnListItem
             const oCtx  = oItem.getBindingContext();                 // contexto do modelo default (OData v4)
             // ajuste o nome do campo abaixo para a sua chave real (ex.: "ID" ou "placa")
-            const id = oCtx.getProperty("placa"); 
+            const id = oCtx.getProperty("ID"); 
             if (!id) {
                 sap.m.MessageToast.show("ID do transporte não encontrado.");
                 return;

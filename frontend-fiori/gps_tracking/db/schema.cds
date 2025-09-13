@@ -6,6 +6,8 @@ using {
 } from '@sap/cds/common';
 
 entity Transporte : cuid, managed {
+      key ID : Integer;
+      @assert.unique
       placa  : String;
       marca  : String;
       modelo : String;
