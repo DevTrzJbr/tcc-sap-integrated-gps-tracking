@@ -39,6 +39,20 @@ sap.ui.define([
             this.oRouter.navTo("RouteDetail", { transpId: encodeURIComponent(id) });
         },
 
+        onPressPage: function (oEvent) {
+            // const oItem = oEvent.getParameter("listItem");           // ColumnListItem
+            // const oCtx  = oItem.getBindingContext();                 // contexto do modelo default (OData v4)
+            // ajuste o nome do campo abaixo para a sua chave real (ex.: "ID" ou "placa")
+            // const id = oCtx.getProperty("ID"); 
+            // if (!id) {
+            //     sap.m.MessageToast.show("ID do transporte não encontrado.");
+            //     return;
+            // }
+            this.oRouter.navTo("RoutePage2" 
+                                // { transpId: encodeURIComponent(id) }
+                            );
+        },
+
         onSaveCreate: async function () {
             const data = this._oCreateDialog.getModel("form").getData();
 

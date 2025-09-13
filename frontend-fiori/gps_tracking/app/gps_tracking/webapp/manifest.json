@@ -105,6 +105,13 @@
           "target": [
             "TargetDetail"
           ]
+        },
+        {
+          "name": "RoutePage2",
+          "pattern": "Page2",
+          "target": [
+            "TargetPage2"
+          ]
         }
       ],
       "targets": {
@@ -115,6 +122,10 @@
         "TargetDetail": {
           "id": "Detail",
           "name": "Detail"
+        },
+        "TargetPage2": {
+          "id": "Page2",
+          "name": "Page2"
         }
       }
     },

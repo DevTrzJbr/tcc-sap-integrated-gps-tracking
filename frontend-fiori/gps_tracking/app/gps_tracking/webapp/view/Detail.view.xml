@@ -17,8 +17,7 @@
 
     <content>
       <!-- Container do mapa -->
-      <core:HTML id="leafletHtml"
-        content="&lt;div id='map' style='height:60vh;width:100%;'&gt;&lt;/div&gt;"/>
+      <core:Fragment fragmentName="com.tcc.gpstracking.view.fragments.Map" type="XML"/>
 
       <!-- (Opcional) mantém seu painel e lista abaixo do mapa -->
       <Panel headerText="Resumo das Rotas" class="sapUiNoContentPadding">

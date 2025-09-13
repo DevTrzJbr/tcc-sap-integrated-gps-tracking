@@ -1,0 +1,6 @@
+<core:FragmentDefinition 
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core">
+    
+    <core:HTML id="leafletHtml" content="&lt;div id='map' style='height:60vh;width:100%;'&gt;&lt;/div&gt;"/>
+</core:FragmentDefinition>
