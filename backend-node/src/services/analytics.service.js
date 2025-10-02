@@ -1,4 +1,5 @@
-const { readCsv } = require('./csv.service');
+const { readCsv, safeName } = require('./csv.service');
+const HttpError = require('../utils/httpError');
 
 const EARTH_RADIUS_M = 6371000.0;
 
@@ -15,7 +16,6 @@ function haversineMeters(lat1, lon1, lat2, lon2) {
 
 function sanitizeTimestamp(ts) {
   if (!ts) return null;
-  // CSV usa formato "YYYY-MM-DD HH:MM:SS" – convertemos para ISO
   const isoLike = ts.replace(' ', 'T');
   const date = new Date(isoLike);
   return Number.isNaN(date.getTime()) ? null : date;
@@ -32,25 +32,25 @@ function parsePoints(rows) {
   const points = [];
 
   for (const row of rows) {
-    const tipo = (row['Tipo'] || '').trim().toLowerCase();
+    const tipo = (row.Tipo || row.tipo || '').trim().toLowerCase();
     if (tipo === 'polygon') {
-      continue; // ignora vértices de áreas proibidas
+      continue;
     }
 
-    const ts = sanitizeTimestamp(row['Timestamp']);
+    const ts = sanitizeTimestamp(row.Timestamp || row.timestamp);
     if (!ts) continue;
 
-    const lat = Number.parseFloat(row['Latitude']);
-    const lon = Number.parseFloat(row['Longitude']);
+    const lat = Number.parseFloat(row.Latitude || row.latitude);
+    const lon = Number.parseFloat(row.Longitude || row.longitude);
     if (!Number.isFinite(lat) || !Number.isFinite(lon)) continue;
 
     points.push({
-      idx: Number.parseInt(row['ID do Ponto'], 10) || points.length + 1,
+      idx: Number.parseInt((row['ID do Ponto'] || row.id || '').replace('poly-', ''), 10) || points.length + 1,
       lat,
       lon,
       ts,
-      tipo: row['Tipo'] || '',
-      nome: row['Nome'] || '',
+      tipo: row.Tipo || row.tipo || '',
+      nome: row.Nome || row.nome || '',
     });
   }
 
@@ -59,7 +59,7 @@ function parsePoints(rows) {
 
 function analysePoints(points) {
   if (points.length < 2) {
-    throw new Error('CSV deve conter pelo menos dois pontos válidos');
+    throw new HttpError(422, 'CSV deve conter pelo menos dois pontos válidos');
   }
 
   let distanceMeters = 0;
@@ -116,30 +116,47 @@ function analysePoints(points) {
 }
 
 async function getRouteMetrics(routeName) {
-  if (!routeName) {
-    throw new Error('Nome da rota é obrigatório');
+  if (!routeName || !routeName.trim()) {
+    throw new HttpError(400, 'Nome da rota é obrigatório');
   }
-  const rows = await readCsv(routeName);
+
+  const normalized = safeName(routeName);
+  let rows;
+  try {
+    rows = await readCsv(normalized);
+  } catch (err) {
+    if (err.code === 'ENOENT') {
+      throw new HttpError(404, `CSV da rota '${normalized}' não encontrado`);
+    }
+    throw err;
+  }
+
   const points = parsePoints(rows);
   if (!points.length) {
-    throw new Error(`Nenhum ponto válido encontrado para a rota '${routeName}'`);
+    throw new HttpError(404, `Nenhum ponto válido encontrado para a rota '${normalized}'`);
   }
+
   const metrics = analysePoints(points);
-  return { route: routeName, metrics };
+  return { route: normalized, metrics };
 }
 
 async function compareRoutes(routeNames = []) {
-  const uniqueNames = Array.from(new Set(routeNames.filter(Boolean)));
+  const uniqueNames = Array.from(new Set(routeNames.filter((name) => !!name && name.trim())));
   if (!uniqueNames.length) {
-    throw new Error('Informe pelo menos uma rota para comparação');
+    throw new HttpError(400, 'Informe pelo menos uma rota (query routes=rotaA,rotaB)');
   }
+
   const results = await Promise.all(uniqueNames.map(async (name) => {
     try {
       return await getRouteMetrics(name);
     } catch (err) {
-      return { route: name, error: err.message };
+      if (err instanceof HttpError && err.status === 404) {
+        return { route: safeName(name), error: err.message };
+      }
+      throw err;
     }
   }));
+
   return results;
 }
 

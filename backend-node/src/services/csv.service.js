@@ -40,4 +40,4 @@ function readCsv(fileNameOrRoute) {
   });
 }
 
-module.exports = { readCsv, BASE_CSV_DIR };
+module.exports = { readCsv, BASE_CSV_DIR, safeName };
