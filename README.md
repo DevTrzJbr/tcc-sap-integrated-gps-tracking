@@ -1,68 +1,11 @@
-# Clonagem Seletiva com Git Sparse Checkout
+# TCC SAP Integrated GPS Tracking
 
-Este repositório utiliza o recurso de **sparse-checkout** do Git para permitir que você baixe apenas partes específicas do projeto — ideal para monorepos com múltiplos ambientes ou componentes.
+Este monorepo reúne os componentes do projeto de TCC para simular, expor e visualizar rotas de transporte integradas ao ecossistema SAP. Ele está organizado em três pilares principais:
 
-## ✅ Pré-requisitos
+- **python_scripts** – gera cenários de deslocamento usando OpenRouteService e exporta CSV/GeoJSON/HTML para alimentar as demais camadas.
+- **backend-node** – publica APIs REST e um stream SSE com base nos arquivos gerados, além de integrar (ou simular) dados do SAP.
+- **frontend-fiori** – aplicação SAP Fiori/UI5 entregue por um projeto CAP que lista transportes, permite criar registros e acompanha a rota planejada e o replay em tempo real.
 
-- Git 2.25 ou superior
-- Bash (Linux/macOS) ou Git Bash (Windows)
+Para detalhes sobre clonagem seletiva do repositório e outras instruções de configuração, consulte o guia em [`docs/config-repo-sparse-checkout.md`](docs/config-repo-sparse-checkout.md).
 
----
-
-## 🔄 Clonando apenas parte do repositório (modo cone)
-
-### Clonar apenas os arquivos da raiz do repositório:
-
-```bash
-mkdir projeto && cd projeto
-git init
-git remote add origin https://github.com/DevTrzJbr/tcc-sap-integrated-gps-tracking.git
-git sparse-checkout init --cone
-git sparse-checkout set .
-git pull master master
-```
-
-## Usando o bootstrap.sh
-
-Use o comando
-```
-bootstrap.sh [ python | frontend | backend | sap | docs | all | main ]
-```
-com alguma das opções para clonar apenas a stack de trabalho.
-
-Exemplo
-
-```bash
-bootstrap.sh python
-```
-Para clonar apenas as partes do repositorio de python configurada no `bootstrap.sh`.
-
-## Estrutura esperada da pasta
-
-Ao executar o bootstrap com a opção `python`, sua pasta deve se parecer com a seguinte estrutura:
-```bash
-tcc-sap-integrated-gps-tracking/
-│
-├── README.md            # Descrição geral do projeto
-├── bootstrap.sh         # Script parse-clone
-|
-└── python-scripts/      # Pasta python-scripts
-    │                    
-    ├── archive/
-    │   ├── script01
-    │   ├── script02
-    │   └── script03
-    |
-    ├── README.md
-    └── main.py
-```
-
-## Observações
-
-- O `bootstrap.sh` também aceita a opção `all` para clonar todo o repositório.
-- A opção `main` pode ser usada para uma configuração mínima com apenas os arquivos principais da raiz.
-
-## Referências
-
-[Documentação oficial do Git - sparse-checkout](https://git-scm.com/docs/git-sparse-checkout)
-[Aritigo - Bring your monorepo down to size with sparse-checkout](https://github.blog/open-source/git/bring-your-monorepo-down-to-size-with-sparse-checkout/)
+Outros guias específicos estão disponíveis na pasta [`docs`](docs/).

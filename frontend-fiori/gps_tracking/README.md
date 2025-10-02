@@ -1,25 +1,5 @@
-# Getting Started
+# Apps CAP + Fiori
 
-Welcome to your new project.
+Projeto CAP que expõe o serviço OData de `Transporte` e faz proxy para o backend Node (`/ext`). Dentro dele está a aplicação SAP Fiori/UI5 que lista transportes, permite criar registros e apresenta o mapa com a rota planejada e o replay em tempo real.
 
-It contains these folders and files, following our recommended project layout:
-
-File or Folder | Purpose
----------|----------
-`app/` | content for UI frontends goes here
-`db/` | your domain models and data go here
-`srv/` | your service models and code go here
-`package.json` | project metadata and configuration
-`readme.md` | this getting started guide
-
-
-## Next Steps
-
-- Open a new terminal and run `cds watch`
-- (in VS Code simply choose _**Terminal** > Run Task > cds watch_)
-- Start adding content, for example, a [db/schema.cds](db/schema.cds).
-
-
-## Learn More
-
-Learn more at https://cap.cloud.sap/docs/get-started/.
+As etapas de configuração do CAP, dependências e execução local estão em [`../../docs/frontend-cap-config.md`](../../docs/frontend-cap-config.md).
