@@ -16,12 +16,14 @@ router.get('/', (_req, res) => {
             rota: { method: 'GET', url: '/api/rota/:routeName', description: 'Retorna pontos de uma rota CSV' },
             stream: { method: 'GET', url: '/api/stream/:routeName', description: 'Reproduz rota em SSE a partir de CSV' },
             veiculos: { method: 'GET', url: '/api/veiculos', description: 'Lista veículos cadastrados' },
+            analytics: { method: 'GET', url: '/api/analytics?routes=rota1,rota2', description: 'Resumo de distância/tempo por rota (comparativo)' },
             replay: { method: 'GET', url: '/replay', description: 'Abre página de teste para stream no navegador' }
         },
         example: {
             rota: '/api/rota/rota_normal',
             stream: '/api/stream/rota_normal',
             veiculos: '/api/veiculos',
+            analytics: '/api/analytics?routes=rota_cgr_aero_vix_base,rota_cgr_aero_vix_via-praca-namorados',
             replay: '/replay'
         }
     });

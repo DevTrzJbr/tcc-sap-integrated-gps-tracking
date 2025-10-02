@@ -16,6 +16,9 @@ router.use('/rota', rotaRoutes);
 const streamRoutes = require('./stream.routes');
 router.use('/stream', streamRoutes);
 
+const analyticsRoutes = require('./analytics.routes');
+router.use('/analytics', analyticsRoutes);
+
 // Página simples de teste do stream (replay)
 router.get('/replay', (req, res) => {
   res.sendFile(path.join(__dirname, '..', 'public', 'replay.html'));

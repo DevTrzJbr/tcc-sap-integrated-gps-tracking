@@ -47,6 +47,8 @@ Se `CSV_DIR` não for informado, o serviço usa automaticamente `../temp` em rel
 - `GET /api/rota/:routeName` – entrega o GeoJSON de uma rota (ex.: `rota_normal`).
 - `GET /api/rota_csv/:routeName` – devolve os pontos em CSV no formato JSON.
 - `GET /api/stream/:routeName` – stream SSE para replay em tempo real; aceita `speed` e `minMs` como query params.
+- `GET /api/analytics/:routeName` – retorna métricas resumidas de uma rota (duração, distância, velocidade).
+- `GET /api/analytics?routes=rota1,rota2` – gera comparativo rápido entre múltiplas rotas.
 - `GET /replay` – página simples de teste para o stream.
 
 Os arquivos consumidos por essas rotas devem estar em `temp/` (criados pelos scripts Python).
