@@ -21,9 +21,6 @@ function readCsv(fileNameOrRoute) {
       : fileNameOrRoute;
     const filePath = path.join(BASE_CSV_DIR, `${safeName(base)}.csv`);
 
-    // log útil pra depurar caminho final
-    console.log('[CSV] lendo:', filePath);
-
     if (!fs.existsSync(filePath)) {
       const err = new Error(`Arquivo CSV não encontrado: ${path.basename(filePath)}`);
       err.code = 'ENOENT';

@@ -1,5 +1,5 @@
 // testCsv.js
-const { readCsv } = require('../services/csvService');
+const { readCsv } = require('../services/csv.service');
 
 (async () => {
   try {
