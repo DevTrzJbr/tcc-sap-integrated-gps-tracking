@@ -36,14 +36,15 @@ python -m python_scripts.main
 
 O script principal:
 
-1. Monta cenários definidos em `main.py` (pontos fixos, desvios e áreas a evitar).
+1. Monta cenários definidos nas estruturas de dados de `python_scripts.data` (pontos fixos, desvios e áreas a evitar).
 2. Calcula as rotas (`route_utils.py`).
 3. Salva os resultados em `temp/` (CSV, GeoJSON e mapa HTML) para serem consumidos pelo backend e frontend.
 
 ### Ajustes úteis
 
-- Edite `main.py` para alterar pontos, desvios e áreas proibidas.
+- Ajuste as coleções em `python_scripts/data/` para alterar pontos, desvios e áreas proibidas.
 - Ajuste `python_scripts/config.py` para informar outra chave de API ou user-agent.
 - Funções auxiliares em `runner.py`, `export_utils.py` e `validators.py` podem ser reutilizadas em novos cenários.
+- Caso queira orquestrar as rotas a partir de outro script, importe `python_scripts.generate_routes` ou construa cenários com `python_scripts.scenario_factory.build_scenarios`.
 
 Mantenha a pasta `temp/` acessível para o backend (`CSV_DIR`) e para o CAP (proxy `/ext`).

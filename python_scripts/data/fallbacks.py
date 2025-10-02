@@ -1,0 +1,34 @@
+"""Fallback coordinates for addresses that occasionally fail geocoding."""
+
+FALLBACK_COORDS = {
+    "Avenida Champagnat, 1466, Vila Velha, ES": (-40.2920, -20.3315),
+    "Guarapari, Espírito Santo": (-40.4979, -20.6731),
+    "R. Manoel Alvarenga, 1995 - Guarapari, ES": (-40.5035, -20.6650),
+    "Av. Paris, Guarapari, ES": (-40.5048, -20.6605),
+    "Terminal de Itaparica, Vila Velha, ES": (-40.2949, -20.3394),
+    "Praia do Morro, Guarapari, ES": (-40.4981, -20.6668),
+    "Rodoviária de Guarapari - Avenida Jones dos Santos Neves, Guarapari, ES": (-40.5046, -20.6662),
+    "Praça Muquiçaba, Guarapari, ES": (-40.5005, -20.6539),
+    "Praça do Papa, Vitória, ES": (-40.2877, -20.3174),
+    "Terminal de Laranjeiras, Serra, ES": (-40.2153, -20.1836),
+    "Shopping Vitória, Vitória, ES": (-40.2969, -20.2954),
+    "Shopping Mestre Álvaro, Serra, ES": (-40.2665, -20.1870),
+    "Parque Pedra da Cebola, Vitória, ES": (-40.2989, -20.2750),
+    "Parque da Cidade, Serra, ES": (-40.2296, -20.2078),
+    "Praia de Camburi, Vitória, ES": (-40.2811, -20.2756),
+    "Hospital Metropolitano, Serra, ES": (-40.2641, -20.2026),
+    "Terminal Campo Grande, Cariacica, ES": (-40.3813, -20.3425),
+    "Aeroporto de Vitória - Eurico de Aguiar Salles, Vitória, ES": (-40.2869, -20.2581),
+    "Rodoviária de Vitória, Vitória, ES": (-40.3106, -20.3141),
+    "Universidade Federal do Espírito Santo, Vitória, ES": (-40.3030, -20.2775),
+    "Hospital Estadual Infantil Nossa Senhora da Glória, Vitória, ES": (-40.3166, -20.3100),
+    "Praça dos Namorados, Vitória, ES": (-40.2909, -20.2960),
+    "Shopping Moxuara, Cariacica, ES": (-40.3989, -20.3739),
+    "Parque Moscoso, Vitória, ES": (-40.3380, -20.3203),
+    "Praça dos Desejos, Vitória, ES": (-40.2921, -20.2965),
+    "Estação Pedro Nolasco, Vitória, ES": (-40.3371, -20.3209),
+    "Hospital da Polícia Militar do Espírito Santo, Vitória, ES": (-40.3232, -20.3169),
+    "Terminal de Carapina, Serra, ES": (-40.2220, -20.2138),
+}
+
+__all__ = ["FALLBACK_COORDS"]
