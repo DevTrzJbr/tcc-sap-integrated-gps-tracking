@@ -46,5 +46,6 @@ O script principal:
 - Ajuste `python_scripts/config.py` para informar outra chave de API ou user-agent.
 - Funções auxiliares em `runner.py`, `export_utils.py` e `validators.py` podem ser reutilizadas em novos cenários.
 - Caso queira orquestrar as rotas a partir de outro script, importe `python_scripts.generate_routes` ou construa cenários com `python_scripts.scenario_factory.build_scenarios`.
+- Utilize `python python_scripts/report.py` para analisar os CSVs gerados (duração, distância, velocidade média e tempo parado por parada).
 
 Mantenha a pasta `temp/` acessível para o backend (`CSV_DIR`) e para o CAP (proxy `/ext`).
