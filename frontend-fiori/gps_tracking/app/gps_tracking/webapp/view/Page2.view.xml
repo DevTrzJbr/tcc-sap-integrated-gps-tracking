@@ -12,7 +12,14 @@
 		navButtonPress=".onNavBack"
 	>
 		<content>
-			<SplitApp
+			<VBox renderType="Bare">
+				<MessageStrip
+					text="{transportes>/error}"
+					type="Error"
+					showIcon="true"
+					visible="{= !!${transportes>/error} }"
+				/>
+				<SplitApp
 				id="SplitAppDemo"
 				initialDetail="detail"
 				initialMaster="master"
@@ -38,31 +45,61 @@
 							fragmentName="com.tcc.gpstracking.view.fragments.Map"
 							type="XML"
 						/>
-						<VBox class="sapUiSmallMargin">
+						<VBox
+							class="sapUiSmallMargin"
+							visible="{= !!${page2>/selectedRoute} }"
+						>
 							<ObjectHeader
-								title="{page2>/selectedRoute/name}"
-								number="{page2>/selectedRoute/code}"
+								title="{page2>/selectedRoute/titulo}"
+								number="{page2>/selectedRoute/id}"
 								numberUnit="rota"
-							/>
+								numDigits="15"
+							>
+								<attributes>
+									<ObjectAttribute
+										title="Transporte"
+										text="{page2>/selectedRoute/transportName}"
+									/>
+									<ObjectAttribute
+										title="Descrição"
+										text="{page2>/selectedRoute/descricao}"
+									/>
+								</attributes>
+								<statuses>
+									<ObjectStatus
+										title="CSV"
+										text="{page2>/selectedRoute/arquivoCsv}"
+									/>
+									<ObjectStatus
+										title="GeoJSON"
+										text="{page2>/selectedRoute/arquivoGeojson}"
+									/>
+								</statuses>
+							</ObjectHeader>
 							<ObjectStatus
-								title="Total de Rotas"
-								state="Information"
-								text="{analytics>/totalRotas}"
-							/>
-							<ObjectStatus
-								title="Distância Total (km)"
+								title="Distância (km)"
 								state="Success"
-								text="{analytics>/distanciaTotalKm}"
+								text="{analytics>/distanceKm}"
 							/>
 							<ObjectStatus
-								title="Tempo Total (h)"
+								title="Duração total (min)"
+								state="Information"
+								text="{analytics>/totalMinutes}"
+							/>
+							<ObjectStatus
+								title="Velocidade média (km/h)"
 								state="None"
-								text="{analytics>/tempoTotalH}"
+								text="{analytics>/averageSpeedKmh}"
 							/>
 							<ObjectStatus
-								title="Custo Estimado (R$)"
+								title="Tempo em movimento (min)"
+								state="Success"
+								text="{analytics>/movingMinutes}"
+							/>
+							<ObjectStatus
+								title="Tempo parado (min)"
 								state="Warning"
-								text="{analytics>/custoTotal}"
+								text="{analytics>/stoppedMinutes}"
 							/>
 						</VBox>
 						<!-- </content> -->
@@ -85,15 +122,16 @@
 						backgroundDesign="List"
 					>
 						<List
-							items="{
-								path: 'page2>/transports'
-							}"
+							busy="{transportes>/loading}"
+							busyIndicatorDelay="0"
+							emptyIndicatorText="Nenhum transporte configurado"
+							items="{ path: 'transportes>/transportes' }"
 							itemPress=".onTransportPress"
 						>
 							<items>
 								<StandardListItem
-									title="{page2>name}"
-									description="ID: {page2>id}"
+									title="{transportes>nome}"
+									description="Código: {transportes>codigo}"
 									type="Navigation"
 								/>
 							</items>
@@ -108,23 +146,25 @@
 						navButtonPress=".onPressMasterBack"
 					>
 						<List
-							items="{
-								path: 'page2>routes'
-							}"
+							visible="{= !!${page2>/selectedTransport} }"
+							emptyIndicatorText="Selecione um transporte"
+							items="{ path: 'transportes>rotas' }"
 							itemPress=".onRoutePress"
 						>
 							<items>
 								<StandardListItem
-									title="{page2>name}"
-									description="Código: {page2>code}"
-									type="Active"
+									title="{transportes>titulo}"
+									description="{transportes>descricao}"
+									type="{= ${transportes>disponivel} ? 'Active' : 'Inactive' }"
+									info="{= ${transportes>disponivel} ? '' : 'Sem arquivos' }"
 									custom:to="detailDetail"
 								/>
 							</items>
 						</List>
 					</Page>
 				</masterPages>
-			</SplitApp>
+				</SplitApp>
+			</VBox>
 		</content>
 	</Page>
 </mvc:View>

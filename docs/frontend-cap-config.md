@@ -4,9 +4,13 @@ Este guia cobre a execução do projeto CAP que expõe o serviço `TransporteSer
 
 ## Pré-requisitos
 
-- Node.js 18+ (ou versão exigida pelo CAP)
-- @sap/cds-dk instalado globalmente (opcional): `npm install -g @sap/cds-dk`
+- Node.js 18, 20 ou 22 (versões suportadas oficialmente pelos pacotes SAP)
+- CLI do CAP (`@sap/cds-dk`) instalada:
+  - local ao projeto: `npm install --save-dev @sap/cds-dk`
+  - ou global (opcional): `npm install -g @sap/cds-dk`
 - Backend Node rodando ou acessível para proxiar `/ext`
+
+> Dica: depois da instalação execute `npx cds --version` (ou `cds --version` se instalada globalmente) para confirmar que a CLI está disponível.
 
 ## Instalação
 
@@ -18,8 +22,10 @@ npm install
 ## Executando em desenvolvimento
 
 ```bash
-cds watch
+npx cds watch
 ```
+
+Se preferir, adicione um script ao `package.json` (`"cds:watch": "cds watch"`) e use `npm run cds:watch`.
 
 O comando levanta o CAP na porta 4004 e abre a aplicação em `http://localhost:4004/gps_tracking/webapp/index.html?sap-ui-xx-viewCache=false`.
 

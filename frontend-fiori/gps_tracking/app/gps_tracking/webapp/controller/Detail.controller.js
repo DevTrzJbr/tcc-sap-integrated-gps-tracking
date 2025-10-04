@@ -1,13 +1,19 @@
 sap.ui.define([
   "sap/ui/core/mvc/Controller",
   "sap/ui/dom/includeStylesheet",
-  "sap/ui/model/json/JSONModel"
-], function (Controller, includeStylesheet, JSONModel) {
+  "sap/ui/model/json/JSONModel",
+  "sap/base/Log"
+], function (Controller, includeStylesheet, JSONModel, Log) {
   "use strict";
+
+  const BASE = "/ext";
 
   function loadScriptOnce(src) {
     return new Promise((resolve, reject) => {
-      if (document.querySelector(`script[src="${src}"]`)) { resolve(); return; }
+      if (document.querySelector(`script[src="${src}"]`)) {
+        resolve();
+        return;
+      }
       const s = document.createElement("script");
       s.src = src;
       s.onload = resolve;
@@ -16,44 +22,55 @@ sap.ui.define([
     });
   }
 
-  // 🔁 mude para "/ext" se você colocou um proxy no CAP (server.js)
-  const BASE = "/ext";
+  function formatNumber(value, fractionDigits) {
+    if (!Number.isFinite(value)) return "-";
+    try {
+      return value.toLocaleString("pt-BR", {
+        minimumFractionDigits: fractionDigits,
+        maximumFractionDigits: fractionDigits
+      });
+    } catch (err) {
+      Log.warning("Falha ao formatar número", err);
+      return value.toFixed(fractionDigits);
+    }
+  }
+
+  function emptyAnalytics() {
+    return {
+      distanceKm: "-",
+      totalMinutes: "-",
+      averageSpeedKmh: "-",
+      movingMinutes: "-",
+      stoppedMinutes: "-"
+    };
+  }
 
   return Controller.extend("com.tcc.gpstracking.controller.Detail", {
     onInit: function () {
-      // ouvir a rota de detalhe e capturar o parâmetro {transpId}
       this._router = this.getOwnerComponent().getRouter();
       this._router.getRoute("RouteDetail").attachPatternMatched(this._onRouteMatched, this);
 
-      // Models de exemplo (mantidos)
-      const oData = {
-        analytics: { totalRotas: 3, distanciaTotalKm: 128.3, tempoTotalH: 5.6, custoTotal: "2.450,00" },
-        routes: [
-          { id: "Rota-001", from: "CD", to: "Cliente A", km: 45.2, coords: [[-23.55052,-46.63331],[-23.56705,-46.64803],[-23.58562,-46.66992]] },
-          { id: "Rota-002", from: "CD", to: "Cliente B", km: 60.1, coords: [[-23.55052,-46.63331],[-23.50188,-46.62000]] },
-          { id: "Rota-003", from: "Cliente B", to: "Cliente C", km: 23.0, coords: [[-23.50188,-46.62000],[-23.48000,-46.59000]] }
-        ]
-      };
-      this.getView().setModel(new JSONModel(oData.analytics), "analytics");
-      this.getView().setModel(new JSONModel(oData.routes), "routes");
+      this._analyticsModel = new JSONModel(emptyAnalytics());
+      this.getView().setModel(this._analyticsModel, "analytics");
+
+      this._stopsModel = new JSONModel([]);
+      this.getView().setModel(this._stopsModel, "routes");
 
       this._map = null;
-      this._geoLayer = null;   // rota estática (GeoJSON)
-      this._trackLive = null;  // trilha “percorrida” (SSE)
-      this._vehicle = null;    // marcador do “carro”
-      this._es = null;         // EventSource
+      this._geoLayer = null;
+      this._trackLive = null;
+      this._vehicle = null;
+      this._es = null;
       this._pts = [];
 
       this.getView().addEventDelegate({ onAfterRendering: this._onAfterRendering.bind(this) });
     },
-    
+
     _onRouteMatched: function (oEvent) {
       const args = oEvent.getParameter("arguments");
       const transpId = decodeURIComponent(args.transpId || "");
-      // joga o ID no input para o usuário ver/editar, se quiser:
       const oInp = this.byId("inpRota");
       if (oInp) oInp.setValue(transpId);
-      // (opcional) já carrega a rota automaticamente ao entrar:
       if (transpId) { this.onCarregarRota(); }
     },
 
@@ -68,56 +85,91 @@ sap.ui.define([
     },
 
     _ensureMap: async function () {
-      // 📦 Carrega Leaflet local (sem CDN)
       const base = sap.ui.require.toUrl("com/tcc/gpstracking/thirdparty/leaflet");
-      includeStylesheet(base + "/leaflet.css");
-      await loadScriptOnce(base + "/leaflet.js");
+      includeStylesheet(`${base}/leaflet.css`);
+      await loadScriptOnce(`${base}/leaflet.js`);
 
-      // cria o mapa no <div id="map">
       this._map = L.map("map").setView([-23.55052, -46.63331], 12);
       L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
         maxZoom: 19,
-        attribution: '&copy; OpenStreetMap'
+        attribution: "© OpenStreetMap"
       }).addTo(this._map);
-
-      // desenha as rotas de exemplo (mantido do seu código)
-      const aRoutes = this.getView().getModel("routes").getData();
-      const aAll = [];
-      aRoutes.forEach(r => {
-        L.polyline(r.coords, { weight: 4 }).addTo(this._map)
-          .bindTooltip(`${r.id} — ${r.km} km`);
-        aAll.push(...r.coords);
-      });
-      if (aAll.length) this._map.fitBounds(aAll, { padding: [20, 20] });
 
       setTimeout(() => this._map.invalidateSize(), 0);
       window.addEventListener("resize", () => this._map.invalidateSize());
     },
 
-    // ============== GeoJSON estático da rota planejada ==============
     onCarregarRota: async function () {
+      const rota = this.byId("inpRota").getValue().trim();
+      if (!rota) {
+        sap.m.MessageToast.show("Informe o nome da rota (sem .csv)");
+        return;
+      }
+
+      const oList = this.byId("routeList");
+      oList.setBusy(true);
       try {
-        const rota = this.byId("inpRota").getValue().trim();
-        if (!rota) { sap.m.MessageToast.show("Informe o nome da rota (sem .csv)"); return; }
-
-        if (this._geoLayer) { this._map.removeLayer(this._geoLayer); this._geoLayer = null; }
-
-        const res = await fetch(`${BASE}/rota/${encodeURIComponent(rota)}`);
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const geo = await res.json();
-
-        this._geoLayer = L.geoJSON(geo, { style: { weight: 4 } }).addTo(this._map);
-        if (this._geoLayer.getBounds && this._geoLayer.getBounds().isValid()) {
-          this._map.fitBounds(this._geoLayer.getBounds(), { padding: [20,20] });
-        }
+        await this._ensureMap();
+        await this._loadGeoJson(rota);
+        await this._loadAnalytics(rota);
       } catch (err) {
-        sap.m.MessageToast.show("Erro ao carregar GeoJSON");
-        // eslint-disable-next-line no-console
-        console.error(err);
+        sap.m.MessageToast.show(err.message || "Erro ao carregar rota");
+        Log.error("Falha ao carregar rota", err);
+        this._analyticsModel.setData(emptyAnalytics());
+        this._stopsModel.setData([]);
+      } finally {
+        oList.setBusy(false);
       }
     },
 
-    // ============== Replay em tempo real via SSE ==============
+    _loadGeoJson: async function (rota) {
+      if (this._geoLayer && this._map) {
+        this._map.removeLayer(this._geoLayer);
+        this._geoLayer = null;
+      }
+      if (!rota) {
+        throw new Error("Nome da rota inválido");
+      }
+      const res = await fetch(`${BASE}/rota/${encodeURIComponent(rota)}`);
+      if (!res.ok) {
+        throw new Error(`GeoJSON não encontrado (HTTP ${res.status})`);
+      }
+      const geo = await res.json();
+      this._geoLayer = L.geoJSON(geo, { style: { weight: 4 } }).addTo(this._map);
+      if (this._geoLayer.getBounds && this._geoLayer.getBounds().isValid()) {
+        this._map.fitBounds(this._geoLayer.getBounds(), { padding: [20, 20] });
+      }
+    },
+
+    _loadAnalytics: async function (rota) {
+      if (!rota) {
+        throw new Error("Nome da rota inválido");
+      }
+      const res = await fetch(`${BASE}/analytics/${encodeURIComponent(rota)}`);
+      if (!res.ok) {
+        throw new Error(`Analytics não disponível (HTTP ${res.status})`);
+      }
+      const data = await res.json();
+      const metrics = data?.metrics || {};
+
+      this._analyticsModel.setData({
+        distanceKm: formatNumber(metrics.distanceKm, 2),
+        totalMinutes: formatNumber(metrics.totalMinutes, 1),
+        averageSpeedKmh: formatNumber(metrics.averageSpeedKmh, 1),
+        movingMinutes: formatNumber(metrics.movingMinutes, 1),
+        stoppedMinutes: formatNumber(metrics.stoppedMinutes, 1)
+      });
+
+      const stopsEntries = Object.entries(metrics.stops || {});
+      const stops = stopsEntries.map(([nome, tempo], idx) => ({
+        id: `${idx + 1}`,
+        nome,
+        minutos: formatNumber(tempo?.minutes, 1),
+        segundos: formatNumber(tempo?.seconds, 0)
+      }));
+      this._stopsModel.setData(stops);
+    },
+
     onStop: function () {
       if (this._es) { this._es.close(); this._es = null; }
       if (this._trackLive) { this._map.removeLayer(this._trackLive); this._trackLive = null; }
@@ -136,14 +188,13 @@ sap.ui.define([
         es = new EventSource(url);
       } catch (e) {
         sap.m.MessageToast.show("Falha ao abrir stream");
-        // eslint-disable-next-line no-console
-        console.error(e);
+        Log.error("SSE", e);
         return;
       }
       this._es = es;
 
       es.addEventListener("message", (evt) => {
-        const data = JSON.parse(evt.data); // {lat, lon, idx, ts, nome, ...}
+        const data = JSON.parse(evt.data);
         const latlng = [data.lat, data.lon];
         this._pts.push(latlng);
 
@@ -167,9 +218,7 @@ sap.ui.define([
       });
 
       es.onerror = () => {
-        // Reconexão automática padrão do EventSource
-        // eslint-disable-next-line no-console
-        console.warn("SSE: erro/reconexão…");
+        Log.warning("SSE: reconectando...");
       };
     }
   });

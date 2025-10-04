@@ -1,109 +1,237 @@
 sap.ui.define([
-	"sap/m/MessageToast",
-	"sap/ui/core/mvc/Controller",
-	"sap/ui/Device",
-	"sap/base/Log",
-	"sap/ui/model/json/JSONModel",
-  	"com/tcc/gpstracking/util/MapHelper"
-], function (MessageToast, Controller, Device, Log, JSONModel, MapHelper) {
-	"use strict";
+  "sap/m/MessageToast",
+  "sap/m/MessageBox",
+  "sap/ui/core/mvc/Controller",
+  "sap/ui/Device",
+  "sap/base/Log",
+  "sap/ui/model/json/JSONModel",
+  "com/tcc/gpstracking/util/MapHelper"
+], function (MessageToast, MessageBox, Controller, Device, Log, JSONModel, MapHelper) {
+  "use strict";
 
-	return Controller.extend("com.tcc.gpstracking.controller.Page2", {
+  const BASE = "/ext";
 
-		onInit: function () {
-			// Modelo com transportes e suas rotas
-			const data = {
-				transports: [
-					{
-						id: "T1", name: "Transporte 1", routes: [
-							{ code: "R1", name: "Rota 1" },
-							{ code: "R2", name: "Rota 2" }
-						]
-					},
-					{
-						id: "T2", name: "Transporte 2", routes: [
-							{ code: "R2", name: "Rota 2" },
-							{ code: "R3", name: "Rota 3" }
-						]
-					},
-					{
-						id: "T3", name: "Transporte 3", routes: [
-							{ code: "R1", name: "Rota 1" },
-							{ code: "R3", name: "Rota 3" },
-							{ code: "R4", name: "Rota 4" }
-						]
-					}
-				],
-				selectedRoute: null
-			};
-			this.getView().setModel(new JSONModel(data), "page2");
+  function toProxyUrl(endpoint) {
+    if (!endpoint) return null;
+    const normalized = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+    const cleaned = normalized.startsWith('/api/') ? normalized.slice(4) : normalized;
+    return `${BASE}${cleaned}`;
+  }
 
-			Device.orientation.attachHandler(this.onOrientationChange, this);
-		},
+  function formatNumber(value, fractionDigits) {
+    if (!Number.isFinite(value)) return "-";
+    try {
+      return value.toLocaleString("pt-BR", {
+        minimumFractionDigits: fractionDigits,
+        maximumFractionDigits: fractionDigits
+      });
+    } catch (err) {
+      Log.warning("Falha ao formatar número", err);
+      return value.toFixed(fractionDigits);
+    }
+  }
 
-		onExit: function () {
-			Device.orientation.detachHandler(this.onOrientationChange, this);
-		},
+  function emptyAnalytics() {
+    return {
+      distanceKm: "-",
+      totalMinutes: "-",
+      averageSpeedKmh: "-",
+      movingMinutes: "-",
+      stoppedMinutes: "-"
+    };
+  }
 
-		getSplitAppObj: function () {
-			const result = this.byId("SplitAppDemo");
-			if (!result) Log.info("SplitApp object can't be found");
-			return result;
-		},
+  return Controller.extend("com.tcc.gpstracking.controller.Page2", {
+    onInit: function () {
+      this._map = null;
+      this._geoLayer = null;
 
-		onNavBack: function () {
-			this.getOwnerComponent().getRouter().navTo("RouteHome");
-		},
+      const oState = new JSONModel({
+        selectedTransport: null,
+        selectedRoute: null,
+        loadingGeo: false,
+        loadingAnalytics: false
+      });
+      this.getView().setModel(oState, "page2");
 
-		onPressMasterBack: function () {
-			this.getSplitAppObj().backMaster();
-		},
+      this._analyticsModel = new JSONModel(emptyAnalytics());
+      this.getView().setModel(this._analyticsModel, "analytics");
 
-		onPressDetailBack: function () {
-			this.getSplitAppObj().backDetail();
-		},
+      Device.orientation.attachHandler(this.onOrientationChange, this);
+    },
 
-		onOrientationChange: function (mParams) {
-			const sMsg = "Orientation now is: " + (mParams.landscape ? "Landscape" : "Portrait");
-			MessageToast.show(sMsg, { duration: 2000 });
-		},
+    onExit: function () {
+      Device.orientation.detachHandler(this.onOrientationChange, this);
+      MapHelper.destroyMap(this._map);
+      this._map = null;
+      this._geoLayer = null;
+    },
 
-		// === Handlers dinâmicos ===
+    getSplitAppObj: function () {
+      const result = this.byId("SplitAppDemo");
+      if (!result) Log.info("SplitApp object can't be found");
+      return result;
+    },
 
-		// 1) Usuário tocou em um transporte no Master → abre Master2 com as rotas desse transporte
-		onTransportPress: function (oEvent) {
-			const oItem = oEvent.getParameter("listItem");
-			const oCtx = oItem.getBindingContext("page2"); // contexto do transporte selecionado
+    onNavBack: function () {
+      this.getOwnerComponent().getRouter().navTo("RouteHome");
+    },
 
-			// Faz element binding no Master2 para este transporte (rotas ficam acessíveis por path relativo 'routes')
-			const oMaster2 = this.byId("master2");
-			oMaster2.bindElement({ path: oCtx.getPath(), model: "page2" });
+    onPressMasterBack: function () {
+      this.getSplitAppObj().backMaster();
+    },
 
-			// navega para a segunda master page
-			this.getSplitAppObj().toMaster(this.createId("master2"));
-		},
+    onPressDetailBack: function () {
+      this.getSplitAppObj().backDetail();
+    },
 
-		// 2) Usuário tocou em uma rota → guarda rota selecionada e abre o detailDetail
-		onRoutePress: function (oEvent) {
-			const oItem = oEvent.getParameter("listItem");
-			const oCtx = oItem.getBindingContext("page2");
-			const route = oCtx.getObject();
+    onOrientationChange: function (mParams) {
+      const sMsg = `Orientation now is: ${mParams.landscape ? "Landscape" : "Portrait"}`;
+      MessageToast.show(sMsg, { duration: 2000 });
+    },
 
-			// guarda a rota p/ o cabeçalho:
-			const m = this.getView().getModel("page2");
-			m.setProperty("/selectedRoute", route);
+    onTransportPress: function (oEvent) {
+      const oItem = oEvent.getParameter("listItem");
+      const oCtx = oItem.getBindingContext("transportes");
+      if (!oCtx) return;
 
-			// navega para o detailDetail:
-			this.getSplitAppObj().toDetail(this.createId("detailDetail"));
+      const transport = oCtx.getObject();
+      const oState = this.getView().getModel("page2");
+      oState.setProperty("/selectedTransport", {
+        id: transport?.id,
+        nome: transport?.nome,
+        codigo: transport?.codigo
+      });
+      oState.setProperty("/selectedRoute", null);
 
-			// cria o mapa (uma vez) no div 'map' do fragment
-			setTimeout(async () => {
-				if (!this._mapP2) {
-					this._mapP2 = await MapHelper.createMap("map", { center: [-20.33, -40.29], zoom: 12 });
-				} else {
-					setTimeout(() => this._mapP2.invalidateSize(), 0);
-				}
-			}, 0);
-		}
-	});
+      this._analyticsModel.setData(emptyAnalytics());
+      if (this._geoLayer && this._map) {
+        MapHelper.removeLayer(this._map, this._geoLayer);
+        this._geoLayer = null;
+      }
+
+      const oMaster2 = this.byId("master2");
+      oMaster2.bindElement({ path: oCtx.getPath(), model: "transportes" });
+
+      this.getSplitAppObj().toMaster(this.createId("master2"));
+    },
+
+    onRoutePress: async function (oEvent) {
+      const oItem = oEvent.getParameter("listItem");
+      const oCtx = oItem.getBindingContext("transportes");
+      if (!oCtx) return;
+
+      const route = oCtx.getObject();
+      if (!route?.disponivel) {
+        MessageToast.show("Arquivos da rota não disponíveis");
+        return;
+      }
+
+      const oState = this.getView().getModel("page2");
+      const transport = oState.getProperty("/selectedTransport") || {};
+
+      oState.setProperty("/selectedRoute", {
+        ...route,
+        transportName: transport.nome,
+        transportCodigo: transport.codigo,
+        arquivoCsv: route?.arquivos?.csv || "-",
+        arquivoGeojson: route?.arquivos?.geojson || "-"
+      });
+
+      this.getSplitAppObj().toDetail(this.createId("detailDetail"));
+
+      const oDetailPage = this.byId("detailDetail");
+      const setBusy = (flag) => {
+        if (oDetailPage?.setBusy) {
+          oDetailPage.setBusy(flag);
+        } else {
+          Log.warning("detailDetail page não encontrado para definir busy state");
+          this.getView().setBusy(flag);
+        }
+      };
+
+      setBusy(true);
+      try {
+        await this._ensureMap();
+        await Promise.all([
+          this._loadGeo(route),
+          this._loadAnalytics(route)
+        ]);
+      } catch (err) {
+        Log.error("Falha ao carregar rota", err);
+        MessageBox.error(err.message || "Erro ao carregar informações da rota.");
+      } finally {
+        setBusy(false);
+      }
+    },
+
+    _ensureMap: async function () {
+      if (!this._map) {
+        this._map = await MapHelper.createMap("map", { center: [-20.33, -40.29], zoom: 11 });
+      } else {
+        setTimeout(() => this._map.invalidateSize(), 0);
+      }
+    },
+
+    _loadGeo: async function (route) {
+      const oState = this.getView().getModel("page2");
+      oState.setProperty("/loadingGeo", true);
+      try {
+        const endpoint = toProxyUrl(route?.endpoints?.geojson);
+        if (!endpoint) {
+          MessageToast.show("GeoJSON não configurado para esta rota.");
+          if (this._geoLayer && this._map) {
+            MapHelper.removeLayer(this._map, this._geoLayer);
+            this._geoLayer = null;
+          }
+          return;
+        }
+        const res = await fetch(endpoint);
+        if (!res.ok) {
+          if (res.status === 404) {
+            MessageToast.show("GeoJSON não encontrado para esta rota.");
+            if (this._geoLayer && this._map) {
+              MapHelper.removeLayer(this._map, this._geoLayer);
+              this._geoLayer = null;
+            }
+            return;
+          }
+          throw new Error(`GeoJSON não encontrado (HTTP ${res.status})`);
+        }
+        const geo = await res.json();
+        if (this._geoLayer && this._map) {
+          MapHelper.removeLayer(this._map, this._geoLayer);
+        }
+        this._geoLayer = MapHelper.addGeoJSON(this._map, geo);
+      } finally {
+        oState.setProperty("/loadingGeo", false);
+      }
+    },
+
+    _loadAnalytics: async function (route) {
+      const oState = this.getView().getModel("page2");
+      oState.setProperty("/loadingAnalytics", true);
+      try {
+        const endpoint = toProxyUrl(route?.endpoints?.analytics);
+        if (!endpoint) {
+          throw new Error("Endpoint de analytics não configurado para a rota");
+        }
+        const res = await fetch(endpoint);
+        if (!res.ok) {
+          throw new Error(`Analytics não disponível (HTTP ${res.status})`);
+        }
+        const data = await res.json();
+        const metrics = data?.metrics || {};
+        this._analyticsModel.setData({
+          distanceKm: formatNumber(metrics.distanceKm, 2),
+          totalMinutes: formatNumber(metrics.totalMinutes, 1),
+          averageSpeedKmh: formatNumber(metrics.averageSpeedKmh, 1),
+          movingMinutes: formatNumber(metrics.movingMinutes, 1),
+          stoppedMinutes: formatNumber(metrics.stoppedMinutes, 1)
+        });
+      } finally {
+        oState.setProperty("/loadingAnalytics", false);
+      }
+    }
+  });
 });

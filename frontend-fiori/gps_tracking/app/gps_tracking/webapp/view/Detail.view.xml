@@ -20,29 +20,31 @@
       <core:Fragment fragmentName="com.tcc.gpstracking.view.fragments.Map" type="XML"/>
 
       <!-- (Opcional) mantém seu painel e lista abaixo do mapa -->
-      <Panel headerText="Resumo das Rotas" class="sapUiNoContentPadding">
+      <Panel headerText="Resumo da Rota" class="sapUiNoContentPadding">
         <HBox justifyContent="SpaceBetween" wrap="Wrap">
           <VBox>
-            <ObjectStatus title="Total de Rotas" state="Information"
-              text="{analytics>/totalRotas}" />
-            <ObjectStatus title="Distância Total (km)" state="Success"
-              text="{analytics>/distanciaTotalKm}" />
+            <ObjectStatus title="Distância (km)" state="Success"
+              text="{analytics>/distanceKm}" />
+            <ObjectStatus title="Tempo total (min)" state="Information"
+              text="{analytics>/totalMinutes}" />
+            <ObjectStatus title="Tempo em movimento (min)" state="Success"
+              text="{analytics>/movingMinutes}" />
           </VBox>
           <VBox>
-            <ObjectStatus title="Tempo Total (h)" state="None"
-              text="{analytics>/tempoTotalH}" />
-            <ObjectStatus title="Custo Estimado (R$)" state="Warning"
-              text="{analytics>/custoTotal}" />
+            <ObjectStatus title="Velocidade média (km/h)" state="None"
+              text="{analytics>/averageSpeedKmh}" />
+            <ObjectStatus title="Tempo parado (min)" state="Warning"
+              text="{analytics>/stoppedMinutes}" />
           </VBox>
         </HBox>
       </Panel>
 
-      <List id="routeList" headerText="Rotas Renderizadas">
+      <List id="routeList" headerText="Flag de paradas" showNoData="true" noDataText="Nenhuma parada registrada">
         <items>
           <StandardListItem
-            title="{routes>id}"
-            description="De {routes>from} para {routes>to} — {routes>km} km"
-            icon="sap-icon://map"
+            title="{routes>nome}"
+            description="{routes>minutos} min — {routes>segundos} s"
+            icon="sap-icon://flag"
             type="Inactive"/>
         </items>
       </List>
