@@ -9,6 +9,9 @@ router.use('/', landingPages);
 const veiculosRoutes = require('./veiculos.routes');
 router.use('/veiculos', veiculosRoutes);
 
+const transportesRoutes = require('./transportes.routes');
+router.use('/transportes', transportesRoutes);
+
 const csvRoutes = require('./csv.routes');
 router.use('/rota_csv', csvRoutes);
 

@@ -49,6 +49,8 @@ Se `CSV_DIR` não for informado, o serviço usa automaticamente `../temp` em rel
 - `GET /api/stream/:routeName` – stream SSE para replay em tempo real; aceita `speed` e `minMs` como query params.
 - `GET /api/analytics/:routeName` – retorna métricas resumidas de uma rota (duração, distância, velocidade).
 - `GET /api/analytics?routes=rota1,rota2` – gera comparativo rápido entre múltiplas rotas.
+- `GET /api/transportes` – lista transportes mapeados e as rotas/arquivos disponíveis para cada um.
+- `GET /api/transportes/:transporteId` – detalhes de um transporte específico.
 - `GET /replay` – página simples de teste para o stream.
 
 Os arquivos consumidos por essas rotas devem estar em `temp/` (criados pelos scripts Python).
@@ -58,6 +60,7 @@ Os arquivos consumidos por essas rotas devem estar em `temp/` (criados pelos scr
 ```
 backend-node/
 ├── src/
+│   ├── data/            # Catálogos estáticos (ex.: transportes e rotas)
 │   ├── routes/          # Rotas REST e SSE
 │   ├── controllers/     # Orquestra leitura de CSV e respostas
 │   ├── services/        # Telemetria, SAP, CSV, GeoJSON
