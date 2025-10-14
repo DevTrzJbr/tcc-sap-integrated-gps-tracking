@@ -21,10 +21,28 @@
                     id="headerCardHost"
                     class="sapUiMediumMarginBottom"
                     width="100%" />
-                <VBox
-                    id="metricsCardHost"
+                <HBox
                     class="sapUiMediumMarginBottom"
-                    width="100%" />
+                    wrap="Wrap"
+                    items="{metricsTiles>/items}">
+                    <items>
+                        <GenericTile
+                            class="sapUiTinyMarginEnd sapUiSmallMarginBottom"
+                            header="{metricsTiles>title}"
+                            subheader="{metricsTiles>subtitle}">
+                            <tileContent>
+                                <TileContent unit="{metricsTiles>unit}">
+                                    <content>
+                                        <NumericContent
+                                            value="{metricsTiles>value}"
+                                            valueColor="{metricsTiles>valueColor}"
+                                            size="L" />
+                                    </content>
+                                </TileContent>
+                            </tileContent>
+                        </GenericTile>
+                    </items>
+                </HBox>
             </VBox>
         </ScrollContainer>
     </Page>

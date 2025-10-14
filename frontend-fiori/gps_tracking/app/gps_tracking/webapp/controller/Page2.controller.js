@@ -60,15 +60,46 @@ sap.ui.define([
     };
   }
 
-  function buildMetricsCardParams(metrics) {
+  function buildMetricsTiles(metrics, hasRoute) {
     const source = metrics || emptyAnalytics();
-    return {
-      distanceKm: source.distanceKm ?? "-",
-      totalMinutes: source.totalMinutes ?? "-",
-      averageSpeedKmh: source.averageSpeedKmh ?? "-",
-      movingMinutes: source.movingMinutes ?? "-",
-      stoppedMinutes: source.stoppedMinutes ?? "-"
-    };
+    const formatValue = (val) => (hasRoute ? val ?? "-" : "-");
+    return [
+      {
+        title: "Distância",
+        subtitle: hasRoute ? "km" : "",
+        value: formatValue(source.distanceKm),
+        unit: hasRoute ? "km" : "",
+        valueColor: "Neutral",
+      },
+      {
+        title: "Tempo Total",
+        subtitle: hasRoute ? "min" : "",
+        value: formatValue(source.totalMinutes),
+        unit: hasRoute ? "min" : "",
+        valueColor: "Neutral",
+      },
+      {
+        title: "Velocidade Média",
+        subtitle: hasRoute ? "km/h" : "",
+        value: formatValue(source.averageSpeedKmh),
+        unit: hasRoute ? "km/h" : "",
+        valueColor: "Neutral",
+      },
+      {
+        title: "Tempo em Movimento",
+        subtitle: hasRoute ? "min" : "",
+        value: formatValue(source.movingMinutes),
+        unit: hasRoute ? "min" : "",
+        valueColor: "Neutral",
+      },
+      {
+        title: "Tempo Parado",
+        subtitle: hasRoute ? "min" : "",
+        value: formatValue(source.stoppedMinutes),
+        unit: hasRoute ? "min" : "",
+        valueColor: "Neutral",
+      },
+    ];
   }
 
   return Controller.extend("com.tcc.gpstracking.controller.Page2", {
@@ -76,7 +107,7 @@ sap.ui.define([
       this._map = null;
       this._geoLayer = null;
       this._headerCard = null;
-      this._metricsCard = null;
+      this._metricsTilesModel = new JSONModel({ items: [] });
 
       const oState = new JSONModel({
         selectedTransport: null,
@@ -88,11 +119,12 @@ sap.ui.define([
 
       this._analyticsModel = new JSONModel(emptyAnalytics());
       this.getView().setModel(this._analyticsModel, "analytics");
+      this.getView().setModel(this._metricsTilesModel, "metricsTiles");
 
       Device.orientation.attachHandler(this.onOrientationChange, this);
 
-      this._ensureCards();
-      this._updateCards();
+      this._ensureHeaderCard();
+      this._updateVisuals();
     },
 
     onExit: function () {
@@ -103,10 +135,6 @@ sap.ui.define([
       if (this._headerCard) {
         this._headerCard.destroy();
         this._headerCard = null;
-      }
-      if (this._metricsCard) {
-        this._metricsCard.destroy();
-        this._metricsCard = null;
       }
     },
 
@@ -152,7 +180,7 @@ sap.ui.define([
         MapHelper.removeLayer(this._map, this._geoLayer);
         this._geoLayer = null;
       }
-      this._updateCards();
+      this._updateVisuals();
 
       const oMaster2 = this.byId("master2");
       oMaster2.bindElement({ path: oCtx.getPath(), model: "transportes" });
@@ -186,7 +214,7 @@ sap.ui.define([
 
       this.getSplitAppObj().toDetail(this.createId("detailDetail"));
 
-      this._updateCards();
+      this._updateVisuals();
 
       const oDetailPage = this.byId("detailDetail");
       const setBusy = (flag) => {
@@ -256,10 +284,8 @@ sap.ui.define([
       }
     },
 
-    _ensureCards: function () {
+    _ensureHeaderCard: function () {
       const headerHost = this.byId("headerCardHost");
-      const metricsHost = this.byId("metricsCardHost");
-
       if (headerHost && !this._headerCard) {
         this._headerCard = new Card({
           width: "100%",
@@ -269,33 +295,24 @@ sap.ui.define([
         headerHost.addItem(this._headerCard);
         this._headerCard.refresh();
       }
-
-      if (metricsHost && !this._metricsCard) {
-        this._metricsCard = new Card({
-          width: "100%",
-          height: "26rem",
-          manifest: sap.ui.require.toUrl("com/tcc/gpstracking/cards/metrics.card.json")
-        });
-        metricsHost.addItem(this._metricsCard);
-        this._metricsCard.refresh();
-      }
-
-      return Boolean(this._headerCard && this._metricsCard);
+      return Boolean(this._headerCard);
     },
 
-    _setCardParameters: function (card, params) {
-      if (!card || !card.setParameters) return;
-      card.setParameters(params);
-      card.refresh();
+    _setHeaderParameters: function (params) {
+      if (!this._headerCard || !this._headerCard.setParameters) return;
+      this._headerCard.setParameters(params);
+      this._headerCard.refresh();
     },
 
-    _updateCards: function () {
-      if (!this._ensureCards()) return;
+    _updateVisuals: function () {
+      this._ensureHeaderCard();
+
       const route = this.getView().getModel("page2").getProperty("/selectedRoute");
       const metrics = this._analyticsModel.getData() || emptyAnalytics();
+      const hasRoute = Boolean(route);
 
-      this._setCardParameters(this._headerCard, buildHeaderCardParams(route));
-      this._setCardParameters(this._metricsCard, buildMetricsCardParams(metrics));
+      this._setHeaderParameters(buildHeaderCardParams(route));
+      this._metricsTilesModel.setData({ items: buildMetricsTiles(metrics, hasRoute) });
     },
 
     _loadAnalytics: async function (route) {
@@ -321,7 +338,7 @@ sap.ui.define([
         });
       } finally {
         oState.setProperty("/loadingAnalytics", false);
-        this._updateCards();
+        this._updateVisuals();
       }
     }
   });
