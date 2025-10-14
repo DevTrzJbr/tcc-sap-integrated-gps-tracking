@@ -1,9 +1,9 @@
 <mvc:View
 	controllerName="com.tcc.gpstracking.controller.Page2"
 	xmlns:mvc="sap.ui.core.mvc"
-	xmlns="sap.m"
-	xmlns:core="sap.ui.core"
-	xmlns:custom="http://schemas.sap.com/sapui5/extension/sap.ui.core.CustomData/1"
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:custom="http://schemas.sap.com/sapui5/extension/sap.ui.core.CustomData/1"
 >
 	<Page
 		id="page2"
@@ -20,149 +20,28 @@
 					visible="{= !!${transportes>/error} }"
 				/>
 				<SplitApp
-				id="SplitAppDemo"
-				initialDetail="detail"
-				initialMaster="master"
-			>
-				<detailPages>
-					<Page
-						id="detail"
-						title="Detail 1"
-						backgroundDesign="Solid"
-					>
-						<Label text="Selecione uma rota no Master 2" />
-					</Page>
-					<Page
-						id="detailDetail"
-						title="Detail da Rota"
-						backgroundDesign="Solid"
-						showNavButton="true"
-						navButtonPress=".onPressDetailBack"
-					>
-						<!-- <content> -->
-						<!-- Container do mapa -->
+					id="SplitAppDemo"
+					initialDetail="detail"
+					initialMaster="master">
+					<detailPages>
 						<core:Fragment
-							fragmentName="com.tcc.gpstracking.view.fragments.Map"
-							type="XML"
-						/>
-						<VBox
-							class="sapUiSmallMargin"
-							visible="{= !!${page2>/selectedRoute} }"
-						>
-							<ObjectHeader
-								title="{page2>/selectedRoute/titulo}"
-								number="{page2>/selectedRoute/id}"
-								numberUnit="rota"
-								numDigits="15"
-							>
-								<attributes>
-									<ObjectAttribute
-										title="Transporte"
-										text="{page2>/selectedRoute/transportName}"
-									/>
-									<ObjectAttribute
-										title="Descrição"
-										text="{page2>/selectedRoute/descricao}"
-									/>
-								</attributes>
-								<statuses>
-									<ObjectStatus
-										title="CSV"
-										text="{page2>/selectedRoute/arquivoCsv}"
-									/>
-									<ObjectStatus
-										title="GeoJSON"
-										text="{page2>/selectedRoute/arquivoGeojson}"
-									/>
-								</statuses>
-							</ObjectHeader>
-							<ObjectStatus
-								title="Distância (km)"
-								state="Success"
-								text="{analytics>/distanceKm}"
-							/>
-							<ObjectStatus
-								title="Duração total (min)"
-								state="Information"
-								text="{analytics>/totalMinutes}"
-							/>
-							<ObjectStatus
-								title="Velocidade média (km/h)"
-								state="None"
-								text="{analytics>/averageSpeedKmh}"
-							/>
-							<ObjectStatus
-								title="Tempo em movimento (min)"
-								state="Success"
-								text="{analytics>/movingMinutes}"
-							/>
-							<ObjectStatus
-								title="Tempo parado (min)"
-								state="Warning"
-								text="{analytics>/stoppedMinutes}"
-							/>
-						</VBox>
-						<!-- </content> -->
-					</Page>
-					<Page
-						id="detail2"
-						title="Outro Detail"
-						backgroundDesign="Solid"
-						showNavButton="true"
-						navButtonPress=".onPressDetailBack"
-					>
-						<Label text="Detail 3 (exemplo)" />
-					</Page>
-				</detailPages>
-				<masterPages>
-					<!-- MASTER 1: lista de Transportes -->
-					<Page
-						id="master"
-						title="Transportes"
-						backgroundDesign="List"
-					>
-						<List
-							busy="{transportes>/loading}"
-							busyIndicatorDelay="0"
-							emptyIndicatorText="Nenhum transporte configurado"
-							items="{ path: 'transportes>/transportes' }"
-							itemPress=".onTransportPress"
-						>
-							<items>
-								<StandardListItem
-									title="{transportes>nome}"
-									description="Código: {transportes>codigo}"
-									type="Navigation"
-								/>
-							</items>
-						</List>
-					</Page>
-					<!-- MASTER 2: rotas do transporte selecionado (element binding no controller) -->
-					<Page
-						id="master2"
-						title="Rotas do Transporte"
-						backgroundDesign="List"
-						showNavButton="true"
-						navButtonPress=".onPressMasterBack"
-					>
-						<List
-							visible="{= !!${page2>/selectedTransport} }"
-							emptyIndicatorText="Selecione um transporte"
-							items="{ path: 'transportes>rotas' }"
-							itemPress=".onRoutePress"
-						>
-							<items>
-								<StandardListItem
-									title="{transportes>titulo}"
-									description="{transportes>descricao}"
-									type="{= ${transportes>disponivel} ? 'Active' : 'Inactive' }"
-									info="{= ${transportes>disponivel} ? '' : 'Sem arquivos' }"
-									custom:to="detailDetail"
-								/>
-							</items>
-						</List>
-					</Page>
-				</masterPages>
+							fragmentName="com.tcc.gpstracking.view.fragments.page2.DetailIntro"
+							type="XML" />
+						<core:Fragment
+							fragmentName="com.tcc.gpstracking.view.fragments.page2.DetailMain"
+							type="XML" />
+						<core:Fragment
+							fragmentName="com.tcc.gpstracking.view.fragments.page2.DetailSecondary"
+							type="XML" />
+					</detailPages>
+					<masterPages>
+						<core:Fragment
+							fragmentName="com.tcc.gpstracking.view.fragments.page2.MasterTransport"
+							type="XML" />
+						<core:Fragment
+							fragmentName="com.tcc.gpstracking.view.fragments.page2.MasterRoutes"
+							type="XML" />
+					</masterPages>
 				</SplitApp>
 			</VBox>
 		</content>

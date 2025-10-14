@@ -1,0 +1,12 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core">
+    <Page
+        id="detail2"
+        title="Outro Detail"
+        backgroundDesign="Solid"
+        showNavButton="true"
+        navButtonPress=".onPressDetailBack">
+        <Label text="Detail 3 (exemplo)" />
+    </Page>
+</core:FragmentDefinition>

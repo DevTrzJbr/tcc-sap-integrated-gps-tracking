@@ -5,8 +5,9 @@ sap.ui.define([
   "sap/ui/Device",
   "sap/base/Log",
   "sap/ui/model/json/JSONModel",
-  "com/tcc/gpstracking/util/MapHelper"
-], function (MessageToast, MessageBox, Controller, Device, Log, JSONModel, MapHelper) {
+  "com/tcc/gpstracking/util/MapHelper",
+  "sap/ui/integration/widgets/Card"
+], function (MessageToast, MessageBox, Controller, Device, Log, JSONModel, MapHelper, Card) {
   "use strict";
 
   const BASE = "/ext";
@@ -41,10 +42,41 @@ sap.ui.define([
     };
   }
 
+  function buildHeaderCardParams(route) {
+    if (!route) {
+      return {
+        titulo: "Selecione uma rota",
+        descricao: "Escolha um transporte para visualizar detalhes.",
+        transporte: "-",
+        codigo: "-"
+      };
+    }
+
+    return {
+      titulo: route.titulo || route.id || "Rota",
+      descricao: route.descricao || "",
+      transporte: route.transportName || "-",
+      codigo: route.transportCodigo || "-"
+    };
+  }
+
+  function buildMetricsCardParams(metrics) {
+    const source = metrics || emptyAnalytics();
+    return {
+      distanceKm: source.distanceKm ?? "-",
+      totalMinutes: source.totalMinutes ?? "-",
+      averageSpeedKmh: source.averageSpeedKmh ?? "-",
+      movingMinutes: source.movingMinutes ?? "-",
+      stoppedMinutes: source.stoppedMinutes ?? "-"
+    };
+  }
+
   return Controller.extend("com.tcc.gpstracking.controller.Page2", {
     onInit: function () {
       this._map = null;
       this._geoLayer = null;
+      this._headerCard = null;
+      this._metricsCard = null;
 
       const oState = new JSONModel({
         selectedTransport: null,
@@ -58,6 +90,9 @@ sap.ui.define([
       this.getView().setModel(this._analyticsModel, "analytics");
 
       Device.orientation.attachHandler(this.onOrientationChange, this);
+
+      this._ensureCards();
+      this._updateCards();
     },
 
     onExit: function () {
@@ -65,6 +100,14 @@ sap.ui.define([
       MapHelper.destroyMap(this._map);
       this._map = null;
       this._geoLayer = null;
+      if (this._headerCard) {
+        this._headerCard.destroy();
+        this._headerCard = null;
+      }
+      if (this._metricsCard) {
+        this._metricsCard.destroy();
+        this._metricsCard = null;
+      }
     },
 
     getSplitAppObj: function () {
@@ -109,6 +152,7 @@ sap.ui.define([
         MapHelper.removeLayer(this._map, this._geoLayer);
         this._geoLayer = null;
       }
+      this._updateCards();
 
       const oMaster2 = this.byId("master2");
       oMaster2.bindElement({ path: oCtx.getPath(), model: "transportes" });
@@ -138,7 +182,11 @@ sap.ui.define([
         arquivoGeojson: route?.arquivos?.geojson || "-"
       });
 
+      this._analyticsModel.setData(emptyAnalytics());
+
       this.getSplitAppObj().toDetail(this.createId("detailDetail"));
+
+      this._updateCards();
 
       const oDetailPage = this.byId("detailDetail");
       const setBusy = (flag) => {
@@ -208,6 +256,48 @@ sap.ui.define([
       }
     },
 
+    _ensureCards: function () {
+      const headerHost = this.byId("headerCardHost");
+      const metricsHost = this.byId("metricsCardHost");
+
+      if (headerHost && !this._headerCard) {
+        this._headerCard = new Card({
+          width: "100%",
+          height: "15rem",
+          manifest: sap.ui.require.toUrl("com/tcc/gpstracking/cards/header-info.card.json")
+        });
+        headerHost.addItem(this._headerCard);
+        this._headerCard.refresh();
+      }
+
+      if (metricsHost && !this._metricsCard) {
+        this._metricsCard = new Card({
+          width: "100%",
+          height: "26rem",
+          manifest: sap.ui.require.toUrl("com/tcc/gpstracking/cards/metrics.card.json")
+        });
+        metricsHost.addItem(this._metricsCard);
+        this._metricsCard.refresh();
+      }
+
+      return Boolean(this._headerCard && this._metricsCard);
+    },
+
+    _setCardParameters: function (card, params) {
+      if (!card || !card.setParameters) return;
+      card.setParameters(params);
+      card.refresh();
+    },
+
+    _updateCards: function () {
+      if (!this._ensureCards()) return;
+      const route = this.getView().getModel("page2").getProperty("/selectedRoute");
+      const metrics = this._analyticsModel.getData() || emptyAnalytics();
+
+      this._setCardParameters(this._headerCard, buildHeaderCardParams(route));
+      this._setCardParameters(this._metricsCard, buildMetricsCardParams(metrics));
+    },
+
     _loadAnalytics: async function (route) {
       const oState = this.getView().getModel("page2");
       oState.setProperty("/loadingAnalytics", true);
@@ -231,6 +321,7 @@ sap.ui.define([
         });
       } finally {
         oState.setProperty("/loadingAnalytics", false);
+        this._updateCards();
       }
     }
   });

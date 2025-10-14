@@ -1,0 +1,10 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core">
+    <Page
+        id="detail"
+        title="Detail 1"
+        backgroundDesign="Solid">
+        <Label text="Selecione uma rota no Master 2" />
+    </Page>
+</core:FragmentDefinition>

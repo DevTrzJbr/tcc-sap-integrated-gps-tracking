@@ -1,0 +1,31 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core">
+    <Page
+        id="detailDetail"
+        title="Detail da Rota"
+        backgroundDesign="Solid"
+        showNavButton="true"
+        navButtonPress=".onPressDetailBack">
+        <core:Fragment
+            fragmentName="com.tcc.gpstracking.view.fragments.Map"
+            type="XML" />
+        <ScrollContainer
+            height="100%"
+            horizontal="false"
+            vertical="true">
+            <VBox
+                class="sapUiSmallMargin"
+                visible="{= !!${page2>/selectedRoute} }">
+                <VBox
+                    id="headerCardHost"
+                    class="sapUiMediumMarginBottom"
+                    width="100%" />
+                <VBox
+                    id="metricsCardHost"
+                    class="sapUiMediumMarginBottom"
+                    width="100%" />
+            </VBox>
+        </ScrollContainer>
+    </Page>
+</core:FragmentDefinition>

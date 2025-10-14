@@ -1,0 +1,27 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:custom="http://schemas.sap.com/sapui5/extension/sap.ui.core.CustomData/1">
+    <Page
+        id="master2"
+        title="Rotas do Transporte"
+        backgroundDesign="List"
+        showNavButton="true"
+        navButtonPress=".onPressMasterBack">
+        <List
+            visible="{= !!${page2>/selectedTransport} }"
+            showNoData="true"
+            noDataText="Selecione um transporte"
+            items="{ path: 'transportes>rotas' }"
+            itemPress=".onRoutePress">
+            <items>
+                <StandardListItem
+                    title="{transportes>titulo}"
+                    description="{transportes>descricao}"
+                    type="{= ${transportes>disponivel} ? 'Active' : 'Inactive' }"
+                    info="{= ${transportes>disponivel} ? '' : 'Sem arquivos' }"
+                    custom:to="detailDetail" />
+            </items>
+        </List>
+    </Page>
+</core:FragmentDefinition>

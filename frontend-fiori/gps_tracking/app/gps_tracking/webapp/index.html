@@ -12,8 +12,9 @@
     </style>
     <script
         id="sap-ui-bootstrap"
-        src="https://sapui5.hana.ondemand.com/1.139.0/resources/sap-ui-core.js"
+        src="https://ui5.sap.com/resources/sap-ui-core.js"
         data-sap-ui-theme="sap_horizon"
+        data-sap-ui-libs="sap.m,sap.ui.core,sap.ui.integration"
         data-sap-ui-resourceroots='{
             "com.tcc.gpstracking": "./"
         }'
@@ -26,6 +27,7 @@
 <body class="sapUiBody sapUiSizeCompact" id="content">
     <div
         data-sap-ui-component
+        manifest="./manifest.json"
         data-name="com.tcc.gpstracking"
         data-id="container"
         data-settings='{"id" : "com.tcc.gpstracking"}'

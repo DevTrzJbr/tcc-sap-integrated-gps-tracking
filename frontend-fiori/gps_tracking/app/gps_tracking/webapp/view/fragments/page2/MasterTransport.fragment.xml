@@ -1,0 +1,23 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core">
+    <Page
+        id="master"
+        title="Transportes"
+        backgroundDesign="List">
+        <List
+            busy="{transportes>/loading}"
+            busyIndicatorDelay="0"
+            showNoData="true"
+            noDataText="Nenhum transporte configurado"
+            items="{ path: 'transportes>/transportes' }"
+            itemPress=".onTransportPress">
+            <items>
+                <StandardListItem
+                    title="{transportes>nome}"
+                    description="Código: {transportes>codigo}"
+                    type="Navigation" />
+            </items>
+        </List>
+    </Page>
+</core:FragmentDefinition>

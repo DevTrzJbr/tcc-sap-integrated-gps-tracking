@@ -45,10 +45,11 @@
   "sap.ui5": {
     "flexEnabled": true,
     "dependencies": {
-      "minUI5Version": "1.139.0",
+      "minUI5Version": "1.120.0",
       "libs": {
         "sap.m": {},
-        "sap.ui.core": {}
+        "sap.ui.core": {},
+        "sap.ui.integration": {}
       }
     },
     "contentDensities": {
@@ -95,23 +96,17 @@
         {
           "name": "RouteHome",
           "pattern": "",
-          "target": [
-            "TargetHome"
-          ]
+          "target": ["TargetHome"]
         },
         {
           "name": "RouteDetail",
           "pattern": "Detail/{transpId}",
-          "target": [
-            "TargetDetail"
-          ]
+          "target": ["TargetDetail"]
         },
         {
           "name": "RoutePage2",
           "pattern": "Page2",
-          "target": [
-            "TargetPage2"
-          ]
+          "target": ["TargetPage2"]
         }
       ],
       "targets": {

@@ -1,0 +1,39 @@
+{
+  "_version": "1.16.0",
+  "sap.app": {
+    "type": "card",
+    "id": "com.tcc.gpstracking.cards.headerInfo"
+  },
+  "sap.card": {
+    "type": "Object",
+    "configuration": {
+      "parameters": {
+        "titulo": { "value": "Selecione uma rota" },
+        "descricao": { "value": "Escolha um transporte para visualizar detalhes." },
+        "transporte": { "value": "-" },
+        "codigo": { "value": "-" }
+      }
+    },
+    "header": {
+      "title": "{{parameters.titulo}}",
+      "subTitle": "{{parameters.descricao}}"
+    },
+    "content": {
+      "groups": [
+        {
+          "title": "Transporte",
+          "items": [
+            {
+              "label": "Nome",
+              "value": "{{parameters.transporte}}"
+            },
+            {
+              "label": "Código",
+              "value": "{{parameters.codigo}}"
+            }
+          ]
+        }
+      ]
+    }
+  }
+}
