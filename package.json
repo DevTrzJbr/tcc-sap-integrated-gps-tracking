@@ -1,0 +1,10 @@
+{
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  },
+  "scripts": {
+    "start:backend": "cd backend-node && npm run dev",
+    "start:frontend": "cd frontend-fiori/gps_tracking && npx cds watch",
+    "start:all": "concurrently \"npm run start:backend\" \"npm run start:frontend\""
+  }
+}
