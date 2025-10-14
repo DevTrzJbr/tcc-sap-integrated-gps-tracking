@@ -69,7 +69,8 @@ sap.ui.define([
         subtitle: hasRoute ? "km" : "",
         value: formatValue(source.distanceKm),
         unit: hasRoute ? "km" : "",
-        valueColor: "Neutral",
+        valueColor: "Good",
+        icon: "sap-icon://journey-change",
       },
       {
         title: "Tempo Total",
@@ -77,13 +78,15 @@ sap.ui.define([
         value: formatValue(source.totalMinutes),
         unit: hasRoute ? "min" : "",
         valueColor: "Neutral",
+        icon: "sap-icon://time-entry-request",
       },
       {
         title: "Velocidade Média",
         subtitle: hasRoute ? "km/h" : "",
         value: formatValue(source.averageSpeedKmh),
         unit: hasRoute ? "km/h" : "",
-        valueColor: "Neutral",
+        valueColor: "Good",
+        icon: "sap-icon://accelerated",
       },
       {
         title: "Tempo em Movimento",
@@ -91,13 +94,15 @@ sap.ui.define([
         value: formatValue(source.movingMinutes),
         unit: hasRoute ? "min" : "",
         valueColor: "Neutral",
+        icon: "sap-icon://performance",
       },
       {
         title: "Tempo Parado",
         subtitle: hasRoute ? "min" : "",
         value: formatValue(source.stoppedMinutes),
         unit: hasRoute ? "min" : "",
-        valueColor: "Neutral",
+        valueColor: "Error",
+        icon: "sap-icon://busy",
       },
     ];
   }

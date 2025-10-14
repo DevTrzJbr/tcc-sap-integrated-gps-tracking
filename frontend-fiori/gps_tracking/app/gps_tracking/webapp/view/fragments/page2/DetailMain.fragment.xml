@@ -36,6 +36,7 @@
                                         <NumericContent
                                             value="{metricsTiles>value}"
                                             valueColor="{metricsTiles>valueColor}"
+                                            icon="{metricsTiles>icon}"
                                             size="L" />
                                     </content>
                                 </TileContent>
