@@ -1,4 +1,5 @@
-folium
-openrouteservice
-shapely
-geopy
+folium==0.20.0
+geopy==2.4.1
+numpy==2.0.2
+openrouteservice==2.3.3
+shapely==2.0.7
