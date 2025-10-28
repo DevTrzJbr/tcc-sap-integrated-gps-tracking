@@ -37,8 +37,7 @@ sap.ui.define([
       const ctx = oEvent.getSource().getBindingContext("home2");
       const transport = ctx.getObject();
       const router = this.getOwnerComponent().getRouter();
-      router.navTo("RoutePage2");
-      MessageToast.show(`Transporte ${transport.nome || transport.id}`);
+      router.navTo("RoutePage2Transport", { transportId: transport.id });
     }
   });
 });

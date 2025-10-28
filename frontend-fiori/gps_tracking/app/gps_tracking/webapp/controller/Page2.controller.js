@@ -128,12 +128,20 @@ sap.ui.define([
 
       Device.orientation.attachHandler(this.onOrientationChange, this);
 
+      this._router = this.getOwnerComponent().getRouter();
+      this._router.getRoute("RoutePage2").attachPatternMatched(this._onPatternMatched, this);
+      this._router.getRoute("RoutePage2Transport").attachPatternMatched(this._onPatternMatched, this);
+
       this._ensureHeaderCard();
       this._updateVisuals();
     },
 
     onExit: function () {
       Device.orientation.detachHandler(this.onOrientationChange, this);
+      if (this._router) {
+        this._router.getRoute("RoutePage2").detachPatternMatched(this._onPatternMatched, this);
+        this._router.getRoute("RoutePage2Transport").detachPatternMatched(this._onPatternMatched, this);
+      }
       MapHelper.destroyMap(this._map);
       this._map = null;
       this._geoLayer = null;
@@ -287,6 +295,55 @@ sap.ui.define([
       } finally {
         oState.setProperty("/loadingGeo", false);
       }
+    },
+
+    _onPatternMatched: function (oEvent) {
+      const args = oEvent.getParameter("arguments") || {};
+      if (args.transportId) {
+        this._selectTransportById(args.transportId);
+      }
+    },
+
+    _selectTransportById: function (transportId, attempt) {
+      const model = this.getView().getModel("transportes");
+      if (!model) return;
+
+      const lista = model.getProperty("/transportes") || [];
+      if (!lista.length) {
+        const nextAttempt = (attempt || 0) + 1;
+        if (nextAttempt > 20) {
+          Log.warning(`Transporte ${transportId} não encontrado (modelo vazio)`);
+          return;
+        }
+        setTimeout(() => this._selectTransportById(transportId, nextAttempt), 200);
+        return;
+      }
+
+      const index = lista.findIndex((item) => item.id === transportId);
+      if (index === -1) {
+        MessageToast.show(`Transporte ${transportId} não encontrado.`);
+        return;
+      }
+
+      const transport = lista[index];
+      const oState = this.getView().getModel("page2");
+      oState.setProperty("/selectedTransport", {
+        id: transport.id,
+        nome: transport.nome,
+        codigo: transport.codigo
+      });
+      oState.setProperty("/selectedRoute", null);
+
+      this._analyticsModel.setData(emptyAnalytics());
+      if (this._geoLayer && this._map) {
+        MapHelper.removeLayer(this._map, this._geoLayer);
+        this._geoLayer = null;
+      }
+
+      const master2 = this.byId("master2");
+      master2.bindElement({ path: `/transportes/${index}`, model: "transportes" });
+      this.getSplitAppObj().toMaster(this.createId("master2"));
+      this._updateVisuals();
     },
 
     _ensureHeaderCard: function () {

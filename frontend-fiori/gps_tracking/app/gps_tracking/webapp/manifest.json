@@ -95,12 +95,12 @@
       "routes": [
         {
           "name": "RouteHome2",
-          "pattern": "home",
+          "pattern": "",
           "target": ["TargetHome2"]
         },
         {
-          "name": "RouteHome2",
-          "pattern": "",
+          "name": "RouteHome2Standalone",
+          "pattern": "home",
           "target": ["TargetHome2"]
         },
         {
@@ -111,6 +111,11 @@
         {
           "name": "RoutePage2",
           "pattern": "page2",
+          "target": ["TargetPage2"]
+        },
+        {
+          "name": "RoutePage2Transport",
+          "pattern": "page2/{transportId}",
           "target": ["TargetPage2"]
         },
         {
