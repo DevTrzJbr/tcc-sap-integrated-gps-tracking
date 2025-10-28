@@ -1,0 +1,39 @@
+<mvc:View
+	controllerName="com.tcc.gpstracking.controller.Home2"
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns="sap.m"
+	xmlns:core="sap.ui.core">
+	<Page
+		id="pageHome2"
+		title="Transportes"
+		busy="{home2>/loading}">
+		<content>
+			<FlexBox
+				direction="Row"
+				wrap="Wrap"
+				alignItems="Start"
+				class="sapUiSmallMargin"
+				items="{home2>/transportes}">
+				<items>
+					<GenericTile
+						class="sapUiSmallMarginEnd sapUiSmallMarginBottom"
+						header="{home2>nome}"
+						subheader="{home2>descricao}"
+						press=".onTilePress">
+						<tileContent>
+                            <TileContent unit="{home2>codigo}">
+                                <content>
+                                    <NumericContent
+                                        value="{home2>totalRotas}"
+                                        valueColor="Neutral"
+                                        icon="sap-icon://task"
+                                    />
+                                </content>
+                            </TileContent>
+						</tileContent>
+					</GenericTile>
+				</items>
+			</FlexBox>
+		</content>
+	</Page>
+</mvc:View>

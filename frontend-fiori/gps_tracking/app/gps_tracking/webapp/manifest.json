@@ -94,25 +94,43 @@
       },
       "routes": [
         {
-          "name": "RouteHome",
+          "name": "RouteHome2",
+          "pattern": "home",
+          "target": ["TargetHome2"]
+        },
+        {
+          "name": "RouteHome2",
           "pattern": "",
+          "target": ["TargetHome2"]
+        },
+        {
+          "name": "RouteHome",
+          "pattern": "home",
           "target": ["TargetHome"]
+        },
+        {
+          "name": "RoutePage2",
+          "pattern": "page2",
+          "target": ["TargetPage2"]
         },
         {
           "name": "RouteDetail",
           "pattern": "Detail/{transpId}",
           "target": ["TargetDetail"]
-        },
-        {
-          "name": "RoutePage2",
-          "pattern": "Page2",
-          "target": ["TargetPage2"]
         }
       ],
       "targets": {
+        "TargetHome2": {
+          "id": "Home2",
+          "name": "Home2"
+        },
         "TargetHome": {
           "id": "Home",
           "name": "Home"
+        },
+        "TargetHome2": {
+          "id": "Home2",
+          "name": "Home2"
         },
         "TargetDetail": {
           "id": "Detail",
