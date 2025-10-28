@@ -128,10 +128,6 @@
           "id": "Home",
           "name": "Home"
         },
-        "TargetHome2": {
-          "id": "Home2",
-          "name": "Home2"
-        },
         "TargetDetail": {
           "id": "Detail",
           "name": "Detail"

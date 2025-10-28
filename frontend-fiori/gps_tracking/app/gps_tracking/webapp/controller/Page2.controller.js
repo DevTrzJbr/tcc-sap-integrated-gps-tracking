@@ -150,7 +150,7 @@ sap.ui.define([
     },
 
     onNavBack: function () {
-      this.getOwnerComponent().getRouter().navTo("RouteHome");
+      this.getOwnerComponent().getRouter().navTo("RouteHome2");
     },
 
     onPressMasterBack: function () {
