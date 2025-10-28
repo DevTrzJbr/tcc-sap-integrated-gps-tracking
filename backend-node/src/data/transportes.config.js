@@ -99,6 +99,51 @@ const TRANSPORTES = [
     ],
   },
   {
+    id: 'garoto-para-shopping-vitoria',
+    codigo: 'GAR-SHOP',
+    nome: 'Fábrica Garoto → Shopping Vitória',
+    descricao: 'Trajeto pela Terceira Ponte com diferentes condições de tráfego.',
+    origem: 'Fábrica Garoto, Vila Velha, ES',
+    destino: 'Shopping Vitória, Vitória, ES',
+    rotas: [
+      {
+        id: 'rota_garoto_shopping_manha-sem-trafego',
+        titulo: 'Manhã sem Tráfego',
+        descricao: 'Rota matinal com fluxo leve na Terceira Ponte.',
+      },
+      {
+        id: 'rota_garoto_shopping_manha-com-parada',
+        titulo: 'Manhã com Parada',
+        descricao: 'Inclui parada no Shopping Praia da Costa e atraso leve na ponte.',
+      },
+      {
+        id: 'rota_garoto_shopping_manha-com-sete-min',
+        titulo: 'Manhã +7 min',
+        descricao: 'Trânsito moderado resultando em atraso de 7 minutos.',
+      },
+      {
+        id: 'rota_garoto_shopping_tarde-com-nove-min',
+        titulo: 'Tarde +9 min',
+        descricao: 'Horário de pico vespertino com atraso de 9 minutos.',
+      },
+      {
+        id: 'rota_garoto_shopping_tarde-com-doze-min',
+        titulo: 'Tarde +12 min',
+        descricao: 'Trânsito intenso na ponte com atraso de 12 minutos.',
+      },
+      {
+        id: 'rota_garoto_shopping_noite-com-cinco-min',
+        titulo: 'Noite +5 min',
+        descricao: 'Fluxo noturno com atraso leve de 5 minutos.',
+      },
+      {
+        id: 'rota_garoto_shopping_noite-com-onze-min',
+        titulo: 'Noite +11 min',
+        descricao: 'Incidente na ponte gera atraso de 11 minutos.',
+      },
+    ],
+  },
+  {
     id: 'cenarios-demonstracao',
     codigo: 'DEMO',
     nome: 'Cenários Demonstrativos',
