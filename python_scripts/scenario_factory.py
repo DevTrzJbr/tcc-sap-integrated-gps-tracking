@@ -82,6 +82,7 @@ def build_scenarios(
                 "rota": family["slug"],
                 "descricao": variant.get("descricao", ""),
                 "stops": variant.get("stops", []),
+                "delay_minutes": variant.get("delay_minutes", 0),
             }
 
             scenarios.append(Scenario(nome=nome, pontos=pontos, evitar=evitar, meta=meta))

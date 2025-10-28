@@ -10,6 +10,8 @@ from .export_utils import salvar_csv, salvar_mapa, salvar_geo
 
 _log = logging.getLogger("simulator")
 
+TARGET_SPEED_KMH = 50.0
+
 
 def _to_latlon(seq_lonlat: List[LonLat]) -> List[Tuple[float, float]]:
     """Converte [(lon,lat)] -> [(lat,lon)] para consumo do mapa/export."""
@@ -27,9 +29,16 @@ def process_scenario(scenario: Scenario, base_out_dir: Path) -> RunOutput:
     # 2) gera rota GeoJSON (em (lon,lat) na geometria)
     rota_geo, distancia_km, duracao_min = gerar_rota(scenario.pontos, evitar_poligonos=scenario.evitar)
 
+    if distancia_km is not None:
+        duracao_min = (distancia_km / TARGET_SPEED_KMH) * 60
+
     # 3) extrai coordenadas e converte p/ (lat,lon) para mapa/csv
     coords_lonlat = rota_geo["features"][0]["geometry"]["coordinates"]
     coords_latlon = _to_latlon(coords_lonlat)
+
+    delay_min = scenario.meta.get("delay_minutes", 0)
+    if delay_min and duracao_min is not None:
+        duracao_min += delay_min
 
     # 4) prepara diretórios/arquivos  <<< ALTERADO
     out_dir = base_out_dir                      # sem subpasta por cenário
@@ -52,7 +61,7 @@ def process_scenario(scenario: Scenario, base_out_dir: Path) -> RunOutput:
         id_rota=scenario.nome,
         pontos_extra=pontos_extra,           # os “pontos de parada” do cenário
         areas_proibidas=[scenario.evitar] if scenario.evitar else None,
-        duracao_min=duracao_min,             # vindo do resumo da rota
+        duracao_min=duracao_min,             # vindo do resumo da rota + atrasos
         tempo_parada_min=10                  # ex.: 10 min parado em cada ponto_extra
     )
     salvar_mapa(
