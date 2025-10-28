@@ -29,6 +29,10 @@ FALLBACK_COORDS = {
     "Estação Pedro Nolasco, Vitória, ES": (-40.3371, -20.3209),
     "Hospital da Polícia Militar do Espírito Santo, Vitória, ES": (-40.3232, -20.3169),
     "Terminal de Carapina, Serra, ES": (-40.2220, -20.2138),
+    "Fábrica Garoto, Vila Velha, ES": (-40.3047, -20.3305),
+    "R. Inácio Higino, Praia da Costa, Vila Velha - ES, 29101-315": (-40.2888017, -20.341604), 
+    "Terceira Ponte, Vila Velha, ES": (-40.3000, -20.3200),
+    "Praça Meyerfreund, Glória, Vila Velha - ES": (-40.2976, -20.3294),
 }
 
 __all__ = ["FALLBACK_COORDS"]

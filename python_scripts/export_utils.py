@@ -3,12 +3,6 @@ import folium
 import os
 from datetime import datetime, timedelta
 import json
-
-import csv
-import folium
-import os
-from datetime import datetime, timedelta
-import json
 import math
 
 def _haversine_m(lat1, lon1, lat2, lon2):
@@ -35,7 +29,10 @@ def salvar_csv(coords, nome_arquivo, id_rota, pontos_extra=None, areas_proibidas
 
     # Pré-processa pontos_extra para busca por proximidade
     pontos_extra = pontos_extra or {}
-    extras_list = [(nome, lat, lon) for nome, (lat, lon) in pontos_extra.items()]
+    extras_list = [
+        {"nome": nome, "lat": lat, "lon": lon, "consumido": False}
+        for nome, (lat, lon) in pontos_extra.items()
+    ]
 
     with open(nome_arquivo, "w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f)
@@ -72,10 +69,13 @@ def salvar_csv(coords, nome_arquivo, id_rota, pontos_extra=None, areas_proibidas
             # Checa se este ponto está próximo de algum ponto_extra (match por raio)
             is_extra = False
             extra_nome = None
-            for nome_e, lat_e, lon_e in extras_list:
-                if _haversine_m(lat, lon, lat_e, lon_e) <= raio_match_m:
+            for extra in extras_list:
+                if extra["consumido"]:
+                    continue
+                if _haversine_m(lat, lon, extra["lat"], extra["lon"]) <= raio_match_m:
                     is_extra = True
-                    extra_nome = nome_e
+                    extra_nome = extra["nome"]
+                    extra["consumido"] = True
                     break
 
             if is_extra:

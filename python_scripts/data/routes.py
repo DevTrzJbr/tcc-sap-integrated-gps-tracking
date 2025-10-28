@@ -168,6 +168,57 @@ ROUTE_FAMILIES: List[RouteFamily] = [
             },
         ],
     },
-]
+    {
+        "slug": "garoto_para_shopping_vitoria",
+        "prefix": "rota_garoto_shopping",
+        "origem": "Praça Meyerfreund, Glória, Vila Velha - ES",
+        "destino": "Av. Américo Buaiz, 200 - Enseada do Suá, Vitória - ES, 29050-902",
+        "variants": [
+            {
+                "suffix": "manha-sem-trafego",
+                "descricao": "Trânsito leve na Terceira Ponte, sem atraso adicional.",
+                "stops": [],
+                "delay_minutes": 0
+            },
+            {
+                "suffix": "manha-com-parada",
+                "descricao": "Parada Shopping Praia da Costa (+10 min) e +5 minutos adicionais na Terceira Ponte (total +15).",
+                "stops": [
+                    "R. Inácio Higino, Praia da Costa, Vila Velha - ES, 29101-315"
+                ],
+                "delay_minutes": 5
+            },
+            {
+                "suffix": "manha-com-sete-min",
+                "descricao": "Fluxo moderado gera +7 minutos de atraso na Terceira Ponte.",
+                "stops": [],
+                "delay_minutes": 7
+            },
+            {
+                "suffix": "tarde-com-nove-min",
+                "descricao": "Horário de pico da tarde adiciona +9 minutos na ponte.",
+                "stops": [],
+                "delay_minutes": 9
+            },
+            {
+                "suffix": "tarde-com-doze-min",
+                "descricao": "Trânsito intenso resulta em +12 minutos de atraso.",
+                "stops": [],
+                "delay_minutes": 12
+            },
+            {
+                "suffix": "noite-com-cinco-min",
+                "descricao": "Fluxo noturno com atraso adicional de +5 minutos.",
+                "stops": [],
+                "delay_minutes": 5
+            },
+            {
+                "suffix": "noite-com-onze-min",
+                "descricao": "Ocorrência noturna causa +11 minutos na Terceira Ponte.",
+                "stops": [],
+                "delay_minutes": 11
+            }
+        ],
+    },
 
-__all__ = ["ROUTE_FAMILIES", "RouteVariant", "RouteFamily"]
+]
