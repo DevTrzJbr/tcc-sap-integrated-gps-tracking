@@ -31,7 +31,7 @@ Principais pacotes: `openrouteservice`, `geopy`, `folium`, `shapely`.
 ## Execução
 
 ```bash
-python -m python_scripts.main
+./python_scripts/venv/bin/python -m python_scripts.main
 ```
 
 O script principal:
