@@ -1,7 +1,8 @@
 import logging
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import asdict
 from pathlib import Path
-from typing import Dict, List, Tuple
+from typing import Dict, List, Tuple, Optional
 
 from .models import Scenario, RunOutput, GeoJSON, LonLat
 from .validators import validar_coordenadas, validar_poligono
@@ -10,7 +11,7 @@ from .export_utils import salvar_csv, salvar_mapa, salvar_geo
 
 _log = logging.getLogger("simulator")
 
-TARGET_SPEED_KMH = 50.0
+TARGET_SPEED_KMH = 80.0
 
 
 def _to_latlon(seq_lonlat: List[LonLat]) -> List[Tuple[float, float]]:
@@ -89,12 +90,20 @@ def process_scenario(scenario: Scenario, base_out_dir: Path) -> RunOutput:
 
 
 def run_all(cenarios: List[Scenario], base_out_dir: Path) -> List[RunOutput]:
-    results: List[RunOutput] = []
-    for c in cenarios:
-        try:
-            results.append(process_scenario(c, base_out_dir))
-        except Exception as e:
-            _log.exception("Erro ao processar '%s': %s", c.nome, e)
+    temp: List[Optional[RunOutput]] = [None] * len(cenarios)
+    with ThreadPoolExecutor(max_workers=3) as executor:
+        future_map = {
+            executor.submit(process_scenario, c, base_out_dir): (idx, c.nome)
+            for idx, c in enumerate(cenarios)
+        }
+        for future in as_completed(future_map):
+            idx, nome = future_map[future]
+            try:
+                temp[idx] = future.result()
+            except Exception as err:
+                _log.exception("Erro ao processar '%s': %s", nome, err)
+
+    results = [r for r in temp if r is not None]
     _log.info("Resumo de execução: %s",
               [dict(nome=r.scenario.nome, pontos=r.inserted_points, out=str(r.out_dir)) for r in results])
     return results
